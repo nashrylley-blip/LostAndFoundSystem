@@ -1,0 +1,734 @@
+﻿```cshtml
+@model List<LostAndFoundSystem.Models.Item>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "My Reports";
+}
+
+<style>
+
+    .reports-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px;
+        color: #123b61;
+    }
+
+    /* PAGE HEADER */
+
+    .reports-header {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #72d3ee, #43b5df);
+        color: white;
+        border-radius: 28px;
+        padding: 42px 45px;
+        margin-bottom: 28px;
+        box-shadow: 0 12px 30px rgba(50, 157, 202, 0.14);
+    }
+
+    .reports-header::after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        right: -80px;
+        top: -150px;
+        background: rgba(255, 255, 255, 0.10);
+    }
+
+    .reports-header h1 {
+        position: relative;
+        z-index: 1;
+        margin: 0 0 8px;
+        font-size: 38px;
+        font-weight: 850;
+        letter-spacing: -0.8px;
+    }
+
+    .reports-header p {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.6;
+        opacity: 0.95;
+    }
+
+    /* REPORTS CARD */
+
+    .reports-card {
+        background: white;
+        border: 1px solid #d8e8f1;
+        border-radius: 24px;
+        padding: 30px;
+        min-height: 430px;
+        box-shadow: 0 10px 25px rgba(55, 111, 145, 0.055);
+    }
+
+    /* CARD HEADER */
+
+    .reports-card-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding-bottom: 19px;
+        border-bottom: 1px solid #e4edf2;
+    }
+
+    .reports-card-header h2 {
+        margin: 0;
+        color: #123b61;
+        font-size: 23px;
+        font-weight: 850;
+    }
+
+    .report-count {
+        padding: 7px 12px;
+        border-radius: 20px;
+        background: #eef8fc;
+        color: #159dcc;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* FILTER BUTTONS */
+
+    .filter-btn-group {
+        display: inline-flex;
+        gap: 4px;
+        background: #f0f7fb;
+        padding: 4px;
+        border-radius: 10px;
+        border: 1px solid #d8e8f1;
+    }
+
+    .filter-btn {
+        padding: 6px 14px;
+        border: none;
+        background: transparent;
+        color: #51718c;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+        color: #159dcc;
+        background: rgba(21, 157, 204, 0.08);
+    }
+
+    .filter-btn.active {
+        background: #159dcc;
+        color: white;
+        box-shadow: 0 3px 8px rgba(21, 157, 204, 0.22);
+    }
+
+    .filter-btn:focus-visible {
+        outline: 2px solid #123b61;
+        outline-offset: 3px;
+    }
+
+    /* REPORT LIST */
+
+    .reports-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .report-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        background: #f9fcfe;
+        border: 1px solid #e0edf3;
+        border-radius: 16px;
+        transition: 0.2s ease;
+    }
+
+    .report-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(55, 111, 145, 0.08);
+        border-color: #c7e4ef;
+    }
+
+    .report-item-left {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        min-width: 0;
+    }
+
+    .report-icon {
+        flex-shrink: 0;
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: #eef8fc;
+        color: #159dcc;
+    }
+
+    .report-icon svg {
+        width: 26px;
+        height: 26px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .report-details {
+        min-width: 0;
+    }
+
+    .report-details h3 {
+        margin: 0 0 7px;
+        color: #254764;
+        font-size: 17px;
+        font-weight: 800;
+        word-break: break-word;
+    }
+
+    .report-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 7px;
+    }
+
+    .report-info span {
+        padding: 4px 9px;
+        border-radius: 8px;
+        background: #eef8fc;
+        color: #56809a;
+        font-size: 11px;
+        font-weight: 650;
+    }
+
+    .report-details p {
+        margin: 0;
+        color: #8195a5;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    /* REPORT STATUS */
+
+    .report-status {
+        flex-shrink: 0;
+        padding: 8px 13px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .status-lost {
+        background: #fff1f1;
+        color: #d9534f;
+    }
+
+    .status-found {
+        background: #eefaf3;
+        color: #2d9b61;
+    }
+
+    /* EMPTY STATE */
+
+    .empty-reports {
+        min-height: 330px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 30px;
+    }
+
+    .empty-reports-icon {
+        width: 68px;
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        border-radius: 20px;
+        background: #eef8fc;
+        color: #159dcc;
+    }
+
+    .empty-reports-icon svg {
+        width: 32px;
+        height: 32px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .empty-reports h3 {
+        margin: 0 0 8px;
+        color: #254764;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .empty-reports p {
+        max-width: 520px;
+        margin: 0;
+        color: #8195a5;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    /* ACTION BUTTONS */
+
+    .report-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 13px 20px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 750;
+        transition: 0.2s ease;
+    }
+
+    .lost-button {
+        background: #159dcc;
+        color: white;
+    }
+
+    .lost-button:hover {
+        background: #118bb5;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(21, 157, 204, 0.18);
+    }
+
+    .found-button {
+        background: white;
+        color: #159dcc;
+        border: 1px solid #159dcc;
+    }
+
+    .found-button:hover {
+        background: #159dcc;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* BACK BUTTON */
+
+    .back-container {
+        margin-top: 25px;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 12px 20px;
+        background: white;
+        color: #159dcc;
+        border: 1px solid #159dcc;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 750;
+        transition: 0.2s ease;
+    }
+
+    .back-button:hover {
+        background: #159dcc;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* FILTER EMPTY MESSAGE */
+
+    .filter-empty-message {
+        text-align: center;
+        padding: 30px;
+        color: #8195a5;
+        font-size: 13px;
+    }
+
+    /* RESPONSIVE */
+
+    @@media (max-width: 800px) {
+        .reports-page {
+            padding: 20px;
+        }
+
+        .reports-header {
+            padding: 32px;
+        }
+
+        .reports-header h1 {
+            font-size: 32px;
+        }
+
+        .reports-card {
+            padding: 27px;
+        }
+
+        .report-item {
+            align-items: flex-start;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .reports-page {
+            padding: 15px;
+        }
+
+        .reports-header {
+            padding: 27px;
+            border-radius: 20px;
+        }
+
+        .reports-header h1 {
+            font-size: 28px;
+        }
+
+        .reports-header p {
+            font-size: 14px;
+        }
+
+        .reports-card {
+            padding: 22px;
+            border-radius: 20px;
+        }
+
+        .filter-btn-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .filter-btn {
+            flex: 1;
+            text-align: center;
+            padding: 6px 4px;
+            font-size: 11px;
+        }
+
+        .report-item {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .report-item-left {
+            align-items: flex-start;
+        }
+
+        .report-status {
+            align-self: flex-start;
+        }
+
+        .empty-reports {
+            padding: 25px 10px;
+        }
+
+        .report-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .action-button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+
+</style>
+
+
+<div class="reports-page">
+
+    <!-- PAGE HEADER -->
+
+    <div class="reports-header">
+
+        <h1>My Reports</h1>
+
+        <p>
+            View and manage the lost and found reports you have submitted.
+        </p>
+
+    </div>
+
+
+    <!-- REPORTS CARD -->
+
+    <div class="reports-card">
+
+        <div class="reports-card-header">
+
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+
+                <h2>My Submitted Reports</h2>
+
+                <span class="report-count" id="reportCount">
+                    @(Model?.Count ?? 0)
+                    @((Model?.Count ?? 0) == 1 ? "Report" : "Reports")
+                </span>
+
+            </div>
+
+            <!-- FILTER BUTTONS -->
+
+            <div class="filter-btn-group">
+
+                <button type="button"
+                        class="filter-btn active"
+                        data-filter="all"
+                        onclick="filterReports('all', this)">
+                    All Reports
+                </button>
+
+                <button type="button"
+                        class="filter-btn"
+                        data-filter="lost"
+                        onclick="filterReports('lost', this)">
+                    Lost Items
+                </button>
+
+                <button type="button"
+                        class="filter-btn"
+                        data-filter="found"
+                        onclick="filterReports('found', this)">
+                    Found Items
+                </button>
+
+            </div>
+
+        </div>
+
+
+        @if (Model != null && Model.Count > 0)
+        {
+            <!-- REPORT LIST -->
+
+            <div class="reports-list" id="reportsList">
+
+                @foreach (var report in Model)
+                {
+                    var reportStatus = (report.Status ?? "").ToLower();
+
+                    <div class="report-item"
+                         data-status="@reportStatus">
+
+                        <div class="report-item-left">
+
+                            <div class="report-icon">
+
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                                    <path d="M8 8h8"></path>
+                                    <path d="M8 12h8"></path>
+                                    <path d="M8 16h5"></path>
+                                </svg>
+
+                            </div>
+
+                            <div class="report-details">
+
+                                <h3>@report.Title</h3>
+
+                                <div class="report-info">
+
+                                    <span>
+                                        @(reportStatus == "lost"
+                                            ? "Lost Item"
+                                            : reportStatus == "found"
+                                                ? "Found Item"
+                                                : report.Status)
+                                    </span>
+
+                                    <span>
+                                        @(report.Category?.CategoryName ?? "No Category")
+                                    </span>
+
+                                    <span>
+                                        @report.DateReported.ToString("MMM dd, yyyy")
+                                    </span>
+
+                                </div>
+
+                                <p>
+                                    @report.LocationFound
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="report-status
+                                    @(reportStatus == "lost"
+                                        ? "status-lost"
+                                        : reportStatus == "found"
+                                            ? "status-found"
+                                            : "")">
+
+                            @report.Status
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+            <!-- Message displayed when a filter has no matches -->
+
+            <p id="filterEmptyMessage"
+               class="filter-empty-message"
+               style="display: none;">
+            </p>
+        }
+        else
+        {
+            <!-- EMPTY STATE -->
+
+            <div class="empty-reports">
+
+                <div class="empty-reports-icon">
+
+                    <svg viewBox="0 0 24 24">
+                        <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+                        <path d="M9 3.5h6"></path>
+                        <path d="M9 9h6"></path>
+                        <path d="M9 13h6"></path>
+                        <path d="M9 17h4"></path>
+                    </svg>
+
+                </div>
+
+                <h3>You don't have any reports yet</h3>
+
+                <p>
+                    Your submitted lost and found reports will appear here.
+                    Once you submit a report, you will be able to view
+                    its details and status from this page.
+                </p>
+
+                <div class="report-actions">
+
+                    <a asp-controller="ReportLost"
+                       asp-action="Index"
+                       class="action-button lost-button">
+                        + Report Lost Item
+                    </a>
+
+                    <a asp-controller="ReportFound"
+                       asp-action="Index"
+                       class="action-button found-button">
+                        + Report Found Item
+                    </a>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- BACK BUTTON -->
+
+    <div class="back-container">
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="back-button">
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+    function filterReports(type, btn) {
+
+        // Update the active button
+        document.querySelectorAll('.filter-btn').forEach(function (button) {
+            button.classList.remove('active');
+        });
+
+        btn.classList.add('active');
+
+        // Get report cards
+        const reports = document.querySelectorAll('.report-item');
+        let visibleCount = 0;
+
+        // Show only reports matching the selected filter
+        reports.forEach(function (report) {
+
+            const reportStatus = report.dataset.status;
+
+            const shouldShow =
+                type === 'all' || reportStatus === type;
+
+            report.style.display = shouldShow ? 'flex' : 'none';
+
+            if (shouldShow) {
+                visibleCount++;
+            }
+        });
+
+        // Update report count
+        const countElement = document.getElementById('reportCount');
+
+        if (countElement) {
+            countElement.textContent =
+                visibleCount + (visibleCount === 1 ? ' Report' : ' Reports');
+        }
+
+        // Show a message if no reports match the selected filter
+        const emptyMessage = document.getElementById('filterEmptyMessage');
+
+        if (emptyMessage) {
+            if (reports.length > 0 && visibleCount === 0) {
+
+                emptyMessage.textContent =
+                    type === 'lost'
+                        ? 'No lost item reports found.'
+                        : type === 'found'
+                            ? 'No found item reports found.'
+                            : 'No reports available.';
+
+                emptyMessage.style.display = 'block';
+
+            } else {
+                emptyMessage.style.display = 'none';
+            }
+        }
+    }
+</script>

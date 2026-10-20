@@ -1,0 +1,112 @@
+@model List<LostAndFoundSystem.Models.Notification>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Notifications";
+    int unread = ViewBag.UnreadCount ?? 0;
+}
+
+<style>
+    .notif-page { max-width: 900px; margin: 0 auto; padding: 30px; color: #17324d; }
+    .notif-header {
+        background: linear-gradient(135deg, #72d3ee, #43b5df); color: white;
+        border-radius: 28px; padding: 36px 40px; margin-bottom: 24px;
+        box-shadow: 0 12px 30px rgba(50,157,202,0.14);
+        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    .notif-header h1 { margin: 0 0 6px; font-size: 32px; font-weight: 900; }
+    .notif-header p { margin: 0; opacity: .95; font-size: 14px; }
+    .btn-mark-all {
+        padding: 11px 20px; border-radius: 12px; border: none; background: rgba(255,255,255,.22);
+        color: white; font-weight: 800; font-size: 13px; cursor: pointer;
+    }
+    .btn-mark-all:hover { background: rgba(255,255,255,.32); }
+    .alert-success { background: #e8f8ef; color: #1a7a45; border: 1px solid #b8e6c9; padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; font-weight: 600; }
+    .notif-list { display: flex; flex-direction: column; gap: 12px; }
+    .notif-card {
+        background: white; border: 1px solid #e0edf5; border-radius: 18px; padding: 20px 22px;
+        box-shadow: 0 6px 18px rgba(28,61,91,.05); display: flex; gap: 16px; align-items: flex-start;
+    }
+    .notif-card.unread { border-left: 4px solid #159dcc; background: #f7fcff; }
+    .notif-icon {
+        width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        font-size: 18px; flex-shrink: 0;
+    }
+    .type-Report { background: #e7f4ff; }
+    .type-Claim { background: #fff3df; }
+    .type-Message { background: #f0eaff; }
+    .type-System { background: #eef3f8; }
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-title { margin: 0 0 4px; font-size: 15px; font-weight: 800; color: #17324d; }
+    .notif-msg { margin: 0 0 8px; font-size: 13px; color: #5a7388; line-height: 1.5; }
+    .notif-meta { font-size: 12px; color: #94a8b8; font-weight: 600; }
+    .notif-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-sm {
+        padding: 7px 12px; border-radius: 9px; border: none; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .btn-read { background: #e7f4ff; color: #1a6fb5; }
+    .btn-del { background: #fdecea; color: #b42318; }
+    .empty { text-align: center; padding: 60px 20px; background: white; border-radius: 20px; border: 1px solid #e0edf5; color: #7890a4; }
+    .empty h3 { margin: 0 0 8px; color: #17324d; font-weight: 800; }
+</style>
+
+<div class="notif-page">
+    <div class="notif-header">
+        <div>
+            <h1>Notifications</h1>
+            <p>@unread unread notification@(unread == 1 ? "" : "s")</p>
+        </div>
+        @if (unread > 0)
+        {
+            <form asp-action="MarkAllRead" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-mark-all">Mark all as read</button>
+            </form>
+        }
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty">
+            <h3>No notifications yet</h3>
+            <p>Updates about your reports, claims, and messages will appear here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="notif-list">
+            @foreach (var n in Model)
+            {
+                <div class="notif-card @(n.IsRead ? "" : "unread")">
+                    <div class="notif-icon type-@n.Type">
+                        @(n.Type switch { "Report" => "📋", "Claim" => "🔑", "Message" => "💬", _ => "🔔" })
+                    </div>
+                    <div class="notif-body">
+                        <h3 class="notif-title">@n.Title</h3>
+                        <p class="notif-msg">@n.Message</p>
+                        <div class="notif-meta">@n.CreatedAt.ToString("MMM dd, yyyy · hh:mm tt") · @n.Type</div>
+                    </div>
+                    <div class="notif-actions">
+                        @if (!n.IsRead)
+                        {
+                            <form asp-action="MarkRead" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@n.NotificationID" />
+                                <button type="submit" class="btn-sm btn-read">Read</button>
+                            </form>
+                        }
+                        <form asp-action="Delete" method="post" onsubmit="return confirm('Delete this notification?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@n.NotificationID" />
+                            <button type="submit" class="btn-sm btn-del">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

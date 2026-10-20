@@ -1,0 +1,2031 @@
+﻿@model LostAndFoundSystem.Models.LoginViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Lost & Found | Campus</title>
+
+    <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                font-family: "Segoe UI", Arial, sans-serif;
+                background: #f4f9fc;
+                color: #173b5b;
+            }
+
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+
+            button,
+            input,
+            select {
+                font-family: inherit;
+            }
+
+            /* =========================================
+                                   NAVBAR
+                                ========================================= */
+
+            .navbar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 82px;
+                padding: 0 48px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                z-index: 20;
+                color: white;
+            }
+
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .brand-logo {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #5fd0ef;
+                color: white;
+                box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+            }
+
+                .brand-logo svg {
+                    width: 24px;
+                    height: 24px;
+                }
+
+            .brand-text {
+                font-size: 20px;
+                font-weight: 700;
+                letter-spacing: -0.5px;
+            }
+
+                .brand-text span {
+                    font-weight: 400;
+                    opacity: 0.9;
+                }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 28px;
+            }
+
+                .nav-links a {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: rgba(255, 255, 255, 0.94);
+                    transition: 0.2s;
+                }
+
+                    .nav-links a:hover {
+                        color: white;
+                        transform: translateY(-1px);
+                    }
+
+            .nav-login {
+                padding: 10px 18px;
+                border: 1px solid rgba(255,255,255,0.55);
+                border-radius: 10px;
+            }
+
+            .nav-start {
+                padding: 10px 18px;
+                border: 1px solid rgba(255,255,255,0.55);
+                border-radius: 10px;
+                background: rgba(255,255,255,0.08);
+            }
+
+                .nav-start:hover {
+                    background: rgba(255,255,255,0.18);
+                }
+
+            /* =========================================
+                                   HERO
+                                ========================================= */
+
+            .hero {
+                min-height: 650px;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                background-image: linear-gradient(
+    135deg,
+    rgba(5, 91, 125, 0.38),
+    rgba(14, 156, 204, 0.28),
+    rgba(71, 197, 229, 0.18)
+), url('/images/campus-bg.png');
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+            }
+
+                .hero::before {
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    background: radial-gradient( circle at 12% 18%, rgba(255,255,255,0.20), transparent 25% ), radial-gradient( circle at 88% 22%, rgba(255,255,255,0.14), transparent 27% );
+                    pointer-events: none;
+                }
+
+                .hero::after {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    height: 150px;
+                    background: linear-gradient( to top, rgba(7, 132, 174, 0.72), transparent );
+                    pointer-events: none;
+                }
+
+            /* =========================================
+                                   CAMPUS SHAPE
+                                ========================================= */
+
+            .campus-shape {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 125px;
+                background: rgba(255,255,255,0.10);
+                clip-path: polygon( 0 60%, 12% 45%, 23% 55%, 35% 30%, 49% 50%, 61% 25%, 73% 48%, 86% 32%, 100% 45%, 100% 100%, 0 100% );
+                z-index: 2;
+            }
+
+            /* =========================================
+                                   HERO CONTENT
+                                ========================================= */
+
+            .hero-content {
+                position: relative;
+                z-index: 5;
+                width: 100%;
+                max-width: 1050px;
+                text-align: center;
+                padding: 125px 25px 105px;
+            }
+
+            .hero-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 9px 16px;
+                border-radius: 30px;
+                background: rgba(255,255,255,0.14);
+                border: 1px solid rgba(255,255,255,0.28);
+                backdrop-filter: blur(8px);
+                color: white;
+                font-size: 12px;
+                font-weight: 700;
+                margin-bottom: 24px;
+            }
+
+            .hero-badge-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: white;
+            }
+
+            .hero h1 {
+                color: white;
+                font-size: clamp(50px, 7vw, 82px);
+                line-height: 0.98;
+                letter-spacing: -4px;
+                margin-bottom: 25px;
+                text-shadow: 0 8px 25px rgba(0, 55, 80, 0.20);
+            }
+
+                .hero h1 span {
+                    color: #d9f7ff;
+                }
+
+            .hero-subtitle {
+                max-width: 680px;
+                margin: 0 auto;
+                color: rgba(255,255,255,0.94);
+                font-size: 17px;
+                line-height: 1.7;
+                text-shadow: 0 3px 12px rgba(0,0,0,0.12);
+            }
+
+            /* =========================================
+                                   QUICK ACTIONS
+                                ========================================= */
+
+            .actions-section {
+                position: relative;
+                margin-top: -52px;
+                z-index: 10;
+                padding: 0 30px 85px;
+            }
+
+            .actions-grid {
+                max-width: 1180px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+
+            .action-card {
+                background: rgba(255,255,255,0.98);
+                border: 1px solid #e5eef3;
+                border-radius: 22px;
+                padding: 25px;
+                min-height: 205px;
+                box-shadow: 0 15px 35px rgba(22, 80, 110, 0.10);
+                display: flex;
+                flex-direction: column;
+                transition: 0.25s;
+            }
+
+                .action-card:hover {
+                    transform: translateY(-7px);
+                    box-shadow: 0 22px 45px rgba(22, 80, 110, 0.15);
+                }
+
+            .action-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 18px;
+            }
+
+                .action-icon svg {
+                    width: 23px;
+                    height: 23px;
+                }
+
+            .icon-blue {
+                background: #e1f4fc;
+                color: #168fc9;
+            }
+
+            .icon-green {
+                background: #e2f8f2;
+                color: #1ba98a;
+            }
+
+            .icon-purple {
+                background: #eee9ff;
+                color: #7059d6;
+            }
+
+            .icon-orange {
+                background: #fff0df;
+                color: #e89435;
+            }
+
+            .action-card h3 {
+                color: #174b73;
+                font-size: 17px;
+                margin-bottom: 8px;
+            }
+
+            .action-card p {
+                color: #7890a1;
+                font-size: 12px;
+                line-height: 1.6;
+                margin-bottom: auto;
+            }
+
+            .action-button {
+                align-self: flex-end;
+                width: 39px;
+                height: 39px;
+                border-radius: 50%;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+                .action-button svg {
+                    width: 18px;
+                    height: 18px;
+                }
+
+                .action-button:hover {
+                    transform: translateX(4px);
+                }
+
+            /* =========================================
+                                   HOW IT WORKS
+                                ========================================= */
+
+            .how-section {
+                padding: 85px 30px 100px;
+                background: linear-gradient( 180deg, #ffffff 0%, #f7fbfd 100% );
+            }
+
+            .section-heading {
+                text-align: center;
+                max-width: 650px;
+                margin: 0 auto 55px;
+            }
+
+                .section-heading .small-title {
+                    color: #1494ce;
+                    font-size: 12px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: 1.7px;
+                    margin-bottom: 10px;
+                }
+
+                .section-heading h2 {
+                    font-size: 39px;
+                    color: #163f5f;
+                    letter-spacing: -1.3px;
+                    margin-bottom: 13px;
+                }
+
+                .section-heading p {
+                    color: #7b909f;
+                    font-size: 14px;
+                    line-height: 1.7;
+                }
+
+            .steps {
+                max-width: 1050px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 22px;
+            }
+
+            .step {
+                text-align: center;
+                padding: 32px 25px;
+                background: white;
+                border: 1px solid #e4edf2;
+                border-radius: 20px;
+                box-shadow: 0 12px 30px rgba(22, 80, 110, 0.08);
+                transition: 0.25s;
+            }
+
+                .step:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 18px 38px rgba(22, 80, 110, 0.12);
+                }
+
+            .step-number {
+                width: 56px;
+                height: 56px;
+                margin: 0 auto 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #e7f7fd;
+                color: #138fc8;
+                font-size: 18px;
+                font-weight: 800;
+            }
+
+            .step h3 {
+                color: #1c4c6c;
+                font-size: 17px;
+                margin-bottom: 8px;
+            }
+
+            .step p {
+                color: #8195a3;
+                font-size: 13px;
+                line-height: 1.7;
+            }
+
+            /* =========================================
+                                   LOGIN SECTION
+                                ========================================= */
+
+            .login-section {
+                padding: 100px 25px;
+                background: radial-gradient( circle at 10% 20%, rgba(21,157,204,0.08), transparent 25% ), radial-gradient( circle at 90% 80%, rgba(21,157,204,0.08), transparent 25% ), #f3f9fc;
+            }
+
+            .login-wrapper {
+                max-width: 1000px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 0.9fr 1.1fr;
+                background: white;
+                border-radius: 25px;
+                overflow: hidden;
+                box-shadow: 0 20px 55px rgba(32, 85, 111, 0.12);
+            }
+
+            .login-intro {
+                padding: 50px;
+                background: linear-gradient( 145deg, #087ea4, #159dcc );
+                color: white;
+            }
+
+                .login-intro h2 {
+                    font-size: 35px;
+                    line-height: 1.1;
+                    letter-spacing: -1.4px;
+                    margin-bottom: 17px;
+                }
+
+                .login-intro p {
+                    color: rgba(255,255,255,0.83);
+                    font-size: 14px;
+                    line-height: 1.7;
+                    margin-bottom: 30px;
+                }
+
+            .login-benefit {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 17px;
+                font-size: 13px;
+            }
+
+            .login-benefit-icon {
+                width: 33px;
+                height: 33px;
+                border-radius: 10px;
+                background: rgba(255,255,255,0.15);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+                .login-benefit-icon svg {
+                    width: 17px;
+                    height: 17px;
+                }
+
+            .login-form-area {
+                padding: 50px;
+            }
+
+                .login-form-area h2 {
+                    color: #183e59;
+                    font-size: 29px;
+                    margin-bottom: 7px;
+                }
+
+                .login-form-area > p {
+                    color: #8195a2;
+                    font-size: 13px;
+                    margin-bottom: 27px;
+                }
+
+            /* =========================================
+                                   ACCOUNT TYPE
+                                ========================================= */
+
+            .account-label {
+                display: block;
+                color: #36566c;
+                font-size: 12px;
+                font-weight: 700;
+                margin-bottom: 9px;
+            }
+
+            .account-types {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .account-option {
+                position: relative;
+            }
+
+                .account-option input {
+                    position: absolute;
+                    opacity: 0;
+                }
+
+            .account-card {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                padding: 11px;
+                border: 1px solid #dce7ed;
+                border-radius: 11px;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+                .account-card:hover {
+                    border-color: #159dcc;
+                }
+
+            .account-option input:checked + .account-card {
+                border-color: #159dcc;
+                background: #f0fbff;
+                box-shadow: 0 0 0 3px rgba(21,157,204,0.08);
+            }
+
+            .account-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 9px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #eaf7fc;
+                color: #148fc8;
+            }
+
+                .account-icon svg {
+                    width: 17px;
+                    height: 17px;
+                }
+
+            .account-info strong {
+                display: block;
+                font-size: 12px;
+                color: #29485c;
+            }
+
+            .account-info span {
+                display: block;
+                color: #8a9da8;
+                font-size: 9px;
+                margin-top: 2px;
+            }
+
+            /* =========================================
+                                   FORM INPUTS
+                                ========================================= */
+
+            .form-group {
+                margin-bottom: 17px;
+            }
+
+                .form-group label {
+                    display: block;
+                    color: #36566c;
+                    font-size: 12px;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                }
+
+            .input-wrapper {
+                position: relative;
+            }
+
+            .input-icon {
+                position: absolute;
+                left: 13px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #91a6b3;
+                display: flex;
+            }
+
+                .input-icon svg {
+                    width: 17px;
+                    height: 17px;
+                }
+
+            .form-input {
+                width: 100%;
+                height: 46px;
+                border: 1px solid #dbe6ec;
+                border-radius: 11px;
+                outline: none;
+                padding: 0 40px;
+                color: #28465a;
+                font-size: 13px;
+                background: #fcfeff;
+                transition: 0.2s;
+            }
+
+                .form-input:focus {
+                    border-color: #159dcc;
+                    box-shadow: 0 0 0 3px rgba(21,157,204,0.08);
+                }
+
+            /* ACCOUNT TYPE DROPDOWN (CUSTOM, WITH ICONS) */
+
+            .custom-select {
+                position: relative;
+                width: 170px;
+            }
+
+            .select-trigger {
+                width: 100%;
+                height: 38px;
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                padding: 0 36px 0 8px;
+                border: 1px solid #dbe6ec;
+                border-radius: 11px;
+                background: #fcfeff;
+                color: #28465a;
+                font-size: 13px;
+                text-align: left;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+                .select-trigger:hover,
+                .custom-select.open .select-trigger {
+                    border-color: #159dcc;
+                }
+
+            .custom-select.open .select-trigger {
+                box-shadow: 0 0 0 3px rgba(21,157,204,0.08);
+            }
+
+            .select-trigger-icon,
+            .select-option-icon {
+                width: 24px;
+                height: 24px;
+                border-radius: 7px;
+                background: #eaf7fc;
+                color: #148fc8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+                .select-trigger-icon svg,
+                .select-option-icon svg {
+                    width: 14px;
+                    height: 14px;
+                }
+
+            .select-arrow {
+                position: absolute;
+                right: 11px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #91a6b3;
+                display: flex;
+                pointer-events: none;
+                transition: transform 0.2s;
+            }
+
+                .select-arrow svg {
+                    width: 17px;
+                    height: 17px;
+                }
+
+            .custom-select.open .select-arrow {
+                transform: translateY(-50%) rotate(180deg);
+            }
+
+            .select-menu {
+                display: none;
+                position: absolute;
+                top: calc(100% + 6px);
+                left: 0;
+                width: 100%;
+                list-style: none;
+                background: white;
+                border: 1px solid #dbe6ec;
+                border-radius: 11px;
+                box-shadow: 0 12px 28px rgba(22, 80, 110, 0.14);
+                padding: 5px;
+                z-index: 30;
+            }
+
+            .custom-select.open .select-menu {
+                display: block;
+            }
+
+            .select-option {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                padding: 7px 8px;
+                border-radius: 8px;
+                font-size: 13px;
+                color: #28465a;
+                cursor: pointer;
+            }
+
+                .select-option:hover {
+                    background: #f0fbff;
+                }
+
+                .select-option.selected {
+                    background: #e7f7fd;
+                    font-weight: 600;
+                }
+
+            .password-toggle {
+                position: absolute;
+                right: 11px;
+                top: 50%;
+                transform: translateY(-50%);
+                border: none;
+                background: transparent;
+                color: #91a6b3;
+                cursor: pointer;
+            }
+
+                .password-toggle svg {
+                    width: 17px;
+                    height: 17px;
+                }
+
+            /* =========================================
+                                   FORM OPTIONS
+                                ========================================= */
+
+            .form-options {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 3px 0 20px;
+            }
+
+            .remember {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                font-size: 11px;
+                color: #728896;
+            }
+
+                .remember input {
+                    accent-color: #159dcc;
+                }
+
+            .forgot-link,
+            .create-link {
+                border: none;
+                background: transparent;
+                color: #108bc2;
+                font-size: 11px;
+                font-weight: 700;
+                cursor: pointer;
+            }
+
+                .forgot-link:hover,
+                .create-link:hover {
+                    text-decoration: underline;
+                }
+
+            /* =========================================
+                                   ERROR
+                                ========================================= */
+
+            .error-message {
+                background: #fff1f1;
+                color: #c14444;
+                border: 1px solid #ffd7d7;
+                padding: 10px 12px;
+                border-radius: 9px;
+                font-size: 11px;
+                margin-bottom: 15px;
+            }
+
+            .success-message {
+                background: #effaf3;
+                color: #1e7a46;
+                border: 1px solid #c9ecd7;
+                padding: 10px 12px;
+                border-radius: 9px;
+                font-size: 11px;
+                margin-bottom: 15px;
+            }
+
+            /* =========================================
+                                   SIGN IN BUTTON
+                                ========================================= */
+
+            .sign-in-btn {
+                width: 100%;
+                height: 47px;
+                border: none;
+                border-radius: 11px;
+                background: linear-gradient( 135deg, #087ea4, #159dcc );
+                color: white;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 9px 20px rgba(21,157,204,0.2);
+                transition: 0.2s;
+            }
+
+                .sign-in-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 12px 25px rgba(21,157,204,0.27);
+                }
+
+            .login-footer {
+                text-align: center;
+                color: #899ba6;
+                font-size: 11px;
+                margin-top: 18px;
+            }
+
+            /* =========================================
+                                   FOOTER
+                                ========================================= */
+
+            footer {
+                background: #10384f;
+                color: white;
+                padding: 45px 30px;
+            }
+
+            .footer-content {
+                max-width: 1150px;
+                margin: auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .footer-brand {
+                font-size: 18px;
+                font-weight: 700;
+                margin-bottom: 7px;
+            }
+
+            .footer-text {
+                color: rgba(255,255,255,0.58);
+                font-size: 11px;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: 25px;
+            }
+
+                .footer-links a {
+                    color: rgba(255,255,255,0.72);
+                    font-size: 11px;
+                }
+
+                    .footer-links a:hover {
+                        color: white;
+                    }
+
+            /* =========================================
+                                   RESPONSIVE
+                                ========================================= */
+
+            @@media (max-width: 950px) {
+
+                .navbar {
+                    padding: 0 25px;
+                }
+
+                .nav-links {
+                    gap: 15px;
+                }
+
+                .actions-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .login-wrapper {
+                    grid-template-columns: 1fr;
+                }
+
+                .login-intro {
+                    padding: 40px;
+                }
+            }
+
+            @@media (max-width: 700px) {
+
+                .navbar {
+                    height: 70px;
+                }
+
+                .brand-text {
+                    font-size: 17px;
+                }
+
+                .nav-links a:not(.nav-login):not(.nav-start) {
+                    display: none;
+                }
+
+                .nav-links {
+                    gap: 8px;
+                }
+
+                .nav-start {
+                    padding: 9px 13px;
+                }
+
+                .hero {
+                    min-height: 610px;
+                    background-position: center center;
+                }
+
+                .hero-content {
+                    padding: 110px 20px 90px;
+                }
+
+                .hero h1 {
+                    font-size: 48px;
+                    letter-spacing: -2px;
+                }
+
+                .hero-subtitle {
+                    font-size: 14px;
+                }
+
+                .actions-section {
+                    padding: 0 18px 60px;
+                }
+
+                .actions-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .steps {
+                    grid-template-columns: 1fr;
+                }
+
+                .login-form-area,
+                .login-intro {
+                    padding: 30px 25px;
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+
+            @@media (max-width: 450px) {
+
+                .navbar {
+                    padding: 0 16px;
+                }
+
+                .brand {
+                    gap: 8px;
+                }
+
+                .brand-logo {
+                    width: 40px;
+                    height: 40px;
+                }
+
+                    .brand-logo svg {
+                        width: 21px;
+                        height: 21px;
+                    }
+
+                .brand-text {
+                    font-size: 15px;
+                }
+
+                .nav-login {
+                    padding: 8px 12px;
+                }
+
+                .nav-start {
+                    display: none;
+                }
+
+                .account-types {
+                    grid-template-columns: 1fr;
+                }
+
+                .form-options {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 10px;
+                }
+
+                .hero h1 {
+                    font-size: 41px;
+                }
+
+                .hero-content {
+                    padding-left: 18px;
+                    padding-right: 18px;
+                }
+            }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================================
+         NAVBAR
+    ========================================= -->
+
+    <header class="navbar">
+
+        <a href="#top" class="brand">
+
+            <div class="brand-logo">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2.2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <circle cx="11" cy="11" r="6.5"></circle>
+
+                    <path d="M16 16L21 21"></path>
+
+                </svg>
+
+            </div>
+
+            <div class="brand-text">
+                Campus <span>Lost & Found</span>
+            </div>
+
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="#how-it-works">
+                How It Works
+            </a>
+
+            <a href="#login" class="nav-login">
+                Sign In
+            </a>
+
+            <a href="#login" class="nav-start">
+                Get Started
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================================
+         HERO
+    ========================================= -->
+
+    <section class="hero" id="top">
+
+        <div class="campus-shape"></div>
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+
+                <span class="hero-badge-dot"></span>
+
+                Campus Lost & Found
+
+            </div>
+
+            <h1>
+
+                Lost something?<br />
+
+                <span>
+                    Let's find it.
+                </span>
+
+            </h1>
+
+            <p class="hero-subtitle">
+
+                A simple campus platform for reporting lost belongings,
+                discovering found items, and helping them get back to
+                their rightful owners.
+
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         QUICK ACTIONS
+    ========================================= -->
+
+    <section class="actions-section">
+
+        <div class="actions-grid">
+
+            <!-- FIND ITEMS -->
+
+            <div class="action-card">
+
+                <div class="action-icon icon-blue">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <circle cx="11" cy="11" r="6"></circle>
+
+                        <path d="M16 16L21 21"></path>
+
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Find Items
+                </h3>
+
+                <p>
+                    Search through reported lost and found items around campus.
+                </p>
+
+                <button class="action-button icon-blue"
+                        type="button"
+                        onclick="document.getElementById('login').scrollIntoView({behavior:'smooth'})">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M5 12h14"></path>
+
+                        <path d="M13 6l6 6-6 6"></path>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+            <!-- REPORT LOST -->
+
+            <div class="action-card">
+
+                <div class="action-icon icon-green">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <rect x="5" y="4"
+                              width="14"
+                              height="16"
+                              rx="2"></rect>
+
+                        <path d="M9 9h6"></path>
+
+                        <path d="M9 13h4"></path>
+
+                        <path d="M12 16v-5"></path>
+
+                        <path d="M9.5 13.5h5"></path>
+
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Report Lost
+                </h3>
+
+                <p>
+                    Let the campus community know about something you've lost.
+                </p>
+
+                <button class="action-button icon-green"
+                        type="button"
+                        onclick="document.getElementById('login').scrollIntoView({behavior:'smooth'})">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M5 12h14"></path>
+
+                        <path d="M13 6l6 6-6 6"></path>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+            <!-- REPORT FOUND -->
+
+            <div class="action-card">
+
+                <div class="action-icon icon-purple">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <rect x="7" y="3"
+                              width="10"
+                              height="18"
+                              rx="2"></rect>
+
+                        <path d="M10 7h4"></path>
+
+                        <path d="M10 11h4"></path>
+
+                        <path d="M10 15h2"></path>
+
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Report Found
+                </h3>
+
+                <p>
+                    Report an item you've found and help return it to its owner.
+                </p>
+
+                <button class="action-button icon-purple"
+                        type="button"
+                        onclick="document.getElementById('login').scrollIntoView({behavior:'smooth'})">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M5 12h14"></path>
+
+                        <path d="M13 6l6 6-6 6"></path>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+            <!-- MY ACCOUNT -->
+
+            <div class="action-card">
+
+                <div class="action-icon icon-orange">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <circle cx="12" cy="8" r="3"></circle>
+
+                        <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"></path>
+
+                    </svg>
+
+                </div>
+
+                <h3>
+                    My Account
+                </h3>
+
+                <p>
+                    Sign in to view your reports, notifications, and account.
+                </p>
+
+                <button class="action-button icon-orange"
+                        type="button"
+                        onclick="document.getElementById('login').scrollIntoView({behavior:'smooth'})">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M5 12h14"></path>
+
+                        <path d="M13 6l6 6-6 6"></path>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         HOW IT WORKS
+    ========================================= -->
+
+    <section class="how-section" id="how-it-works">
+
+        <div class="section-heading">
+
+            <div class="small-title">
+                How It Works
+            </div>
+
+            <h2>
+                Simple. Clear. Connected.
+            </h2>
+
+            <p>
+                The Campus Lost & Found System makes it easier to report,
+                search, and reconnect lost belongings with their owners.
+            </p>
+
+        </div>
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <h3>
+                    Report an Item
+                </h3>
+
+                <p>
+                    Submit details about something you've lost or found
+                    on campus.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <h3>
+                    Search & Discover
+                </h3>
+
+                <p>
+                    Browse reported items and check whether your belongings
+                    have already been found.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <h3>
+                    Get Reconnected
+                </h3>
+
+                <p>
+                    Coordinate through the system and help return the item
+                    to its rightful owner.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         LOGIN
+    ========================================= -->
+
+    <section class="login-section" id="login">
+
+        <div class="login-wrapper">
+
+            <!-- LEFT -->
+
+            <div class="login-intro">
+
+                <h2>
+                    Welcome back.
+                </h2>
+
+                <p>
+                    Sign in to access the Campus Lost & Found System
+                    and manage your lost and found reports.
+                </p>
+
+
+                <div class="login-benefit">
+
+                    <div class="login-benefit-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <circle cx="12" cy="12" r="9"></circle>
+
+                            <path d="M8 12l2.5 2.5L16 9"></path>
+
+                        </svg>
+
+                    </div>
+
+                    <span>
+                        Report lost and found items
+                    </span>
+
+                </div>
+
+
+                <div class="login-benefit">
+
+                    <div class="login-benefit-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <circle cx="11" cy="11" r="6"></circle>
+
+                            <path d="M16 16l5 5"></path>
+
+                        </svg>
+
+                    </div>
+
+                    <span>
+                        Search reported belongings
+                    </span>
+
+                </div>
+
+
+                <div class="login-benefit">
+
+                    <div class="login-benefit-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <path d="M20 11.5a8 8 0 0 1-12.9 6.3L4 19l1.2-3.1A8 8 0 1 1 20 11.5z"></path>
+
+                        </svg>
+
+                    </div>
+
+                    <span>
+                        Stay updated with notifications
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT LOGIN FORM -->
+
+            <div class="login-form-area">
+
+                <h2>
+                    Sign in
+                </h2>
+
+                <p>
+                    Select your account type and enter your credentials.
+                </p>
+
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="error-message">
+                        @ViewBag.Error
+                    </div>
+                }
+
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="success-message">
+                        @TempData["Success"]
+                    </div>
+                }
+
+
+                <form asp-controller="Account"
+                      asp-action="Login"
+                      method="post">
+
+                    <!-- ACCOUNT TYPE (DROPDOWN) -->
+
+                    <div class="form-group">
+
+                        <label for="roleTrigger">
+                            Account Type
+                        </label>
+
+                        <div class="custom-select" id="roleSelect">
+
+                            <input type="hidden"
+                                   id="Role"
+                                   name="Role"
+                                   value="@(Model?.Role == "Admin" ? "Admin" : "Student")" />
+
+                            <button type="button"
+                                    class="select-trigger"
+                                    id="roleTrigger"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false">
+
+                                <span class="select-trigger-icon" id="roleTriggerIcon"></span>
+
+                                <span id="roleTriggerText">Student</span>
+
+                            </button>
+
+                            <span class="select-arrow">
+
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                    <path d="M6 9l6 6 6-6"></path>
+
+                                </svg>
+
+                            </span>
+
+                            <ul class="select-menu" role="listbox">
+
+                                <!-- STUDENT -->
+
+                                <li class="select-option"
+                                    role="option"
+                                    data-value="Student">
+
+                                    <span class="select-option-icon">
+
+                                        <svg viewBox="0 0 24 24"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             stroke-linecap="round"
+                                             stroke-linejoin="round">
+
+                                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+
+                                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+
+                                        </svg>
+
+                                    </span>
+
+                                    <span class="option-label">Student</span>
+
+                                </li>
+
+                                <!-- ADMIN -->
+
+                                <li class="select-option"
+                                    role="option"
+                                    data-value="Admin">
+
+                                    <span class="select-option-icon">
+
+                                        <svg viewBox="0 0 24 24"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             stroke-linecap="round"
+                                             stroke-linejoin="round">
+
+                                            <path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"></path>
+
+                                            <path d="M9.5 12l1.7 1.7L15 10"></path>
+
+                                        </svg>
+
+                                    </span>
+
+                                    <span class="option-label">Administrator</span>
+
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- USERNAME -->
+
+                    <div class="form-group">
+
+                        <label for="Username" id="usernameLabel">Student ID</label>
+
+                        <div class="input-wrapper">
+
+                            <div class="input-icon">
+
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+
+                                    <circle cx="12" cy="7" r="4"></circle>
+
+                                </svg>
+
+                            </div>
+
+                            <input asp-for="Username"
+                                   id="Username"
+                                   class="form-input"
+                                   type="text"
+                                   placeholder="Enter your Student ID (e.g. 2026-12345)"
+                                   autocomplete="username" />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="form-group">
+
+                        <label for="Password">
+                            Password
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <div class="input-icon">
+
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                    <rect x="4"
+                                          y="10"
+                                          width="16"
+                                          height="11"
+                                          rx="2"></rect>
+
+                                    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+
+                                </svg>
+
+                            </div>
+
+
+                            <input asp-for="Password"
+                                   id="Password"
+                                   class="form-input"
+                                   type="password"
+                                   placeholder="Enter your password"
+                                   autocomplete="current-password" />
+
+
+                            <button type="button"
+                                    class="password-toggle"
+                                    onclick="togglePassword()"
+                                    aria-label="Show password">
+
+                                <svg id="eyeIcon"
+                                     viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+
+                                    <circle cx="12" cy="12" r="2.5"></circle>
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- OPTIONS -->
+
+                    <div class="form-options">
+
+                        <label class="remember">
+
+                            <input type="checkbox" />
+
+                            <span>
+                                Remember me
+                            </span>
+
+                        </label>
+
+
+                        <button type="button"
+                                class="forgot-link"
+                                onclick="alert('Please contact the system administrator to reset your password.')">
+
+                            Forgot password?
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- SIGN IN -->
+
+                    <button type="submit"
+                            class="sign-in-btn">
+
+                        Sign In
+
+                    </button>
+
+                </form>
+
+
+                <div class="login-footer">
+
+                    Don't have an account?
+
+                    <a asp-controller="Account"
+                       asp-action="Register"
+                       class="create-link">
+
+                        Create Account
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div>
+
+                <div class="footer-brand">
+                    Campus Lost & Found
+                </div>
+
+                <div class="footer-text">
+                    A campus platform for reconnecting people with their belongings.
+                </div>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="#top">
+                    Home
+                </a>
+
+                <a href="#how-it-works">
+                    How It Works
+                </a>
+
+                <a href="#login">
+                    Sign In
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================= -->
+
+    <script>
+
+            // STUDENT ID / ADMIN LOGIN FIELD (changes with the Account Type dropdown)
+            function updateUsernameField() {
+
+                var roleInput = document.getElementById("Role");
+                var label = document.getElementById("usernameLabel");
+                var username = document.getElementById("Username");
+
+                if (!roleInput || !label || !username) {
+                    return;
+                }
+
+                var isAdmin = roleInput.value === "Admin";
+
+                label.textContent = isAdmin ? "Admin Email or Username" : "Student ID";
+
+                username.placeholder = isAdmin
+                    ? "Enter your admin email or username"
+                    : "Enter your Student ID (e.g. 2026-12345)";
+
+            }
+
+            // ACCOUNT TYPE DROPDOWN
+            (function () {
+
+                const root = document.getElementById("roleSelect");
+                const trigger = document.getElementById("roleTrigger");
+                const hidden = document.getElementById("Role");
+                const triggerIcon = document.getElementById("roleTriggerIcon");
+                const triggerText = document.getElementById("roleTriggerText");
+                const options = root.querySelectorAll(".select-option");
+
+                function setRole(value) {
+
+                    options.forEach(function (opt) {
+
+                        const active = opt.dataset.value === value;
+
+                        opt.classList.toggle("selected", active);
+                        opt.setAttribute("aria-selected", active);
+
+                        if (active) {
+                            hidden.value = value;
+                            updateUsernameField();
+                            triggerText.textContent = opt.querySelector(".option-label").textContent;
+                            triggerIcon.innerHTML = opt.querySelector(".select-option-icon").innerHTML;
+                        }
+
+                    });
+
+                }
+
+                function closeMenu() {
+                    root.classList.remove("open");
+                    trigger.setAttribute("aria-expanded", "false");
+                }
+
+                trigger.addEventListener("click", function () {
+                    const isOpen = root.classList.toggle("open");
+                    trigger.setAttribute("aria-expanded", isOpen);
+                });
+
+                options.forEach(function (opt) {
+                    opt.addEventListener("click", function () {
+                        setRole(opt.dataset.value);
+                        closeMenu();
+                    });
+                });
+
+                document.addEventListener("click", function (e) {
+                    if (!root.contains(e.target)) {
+                        closeMenu();
+                    }
+                });
+
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape") {
+                        closeMenu();
+                    }
+                });
+
+                setRole(hidden.value);
+
+            })();
+
+
+            function togglePassword() {
+
+                const passwordInput =
+                    document.getElementById("Password");
+
+                const eyeIcon =
+                    document.getElementById("eyeIcon");
+
+
+                if (passwordInput.type === "password") {
+
+                    passwordInput.type = "text";
+
+
+                    eyeIcon.innerHTML = `
+                        <path d="M3 3l18 18"></path>
+                        <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path>
+                        <path d="M9.9 5.1A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7a18.4 18.4 0 0 1-3.1 3.9"></path>
+                        <path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7a10.8 10.8 0 0 0 3.4-.5"></path>
+                    `;
+
+                }
+                else {
+
+                    passwordInput.type = "password";
+
+
+                    eyeIcon.innerHTML = `
+                        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+                        <circle cx="12" cy="12" r="2.5"></circle>
+                    `;
+
+                }
+
+            }
+
+    </script>
+
+</body>
+</html>

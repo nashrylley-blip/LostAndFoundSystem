@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: lost-and-found-system
+    runtime: docker
+    dockerfilePath: ./LostAndFoundSystem/Dockerfile
+    dockerContext: ./LostAndFoundSystem
+    plan: free
+    healthCheckPath: /Account/Login
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        value: Data Source=/data/lostandfound.db
+      # Optional: set these in Render dashboard for email verification
+      - key: Smtp__Username
+        sync: false
+      - key: Smtp__AppPassword
+        sync: false
+    disk:
+      name: lostandfound-data
+      mountPath: /data
+      sizeGB: 1

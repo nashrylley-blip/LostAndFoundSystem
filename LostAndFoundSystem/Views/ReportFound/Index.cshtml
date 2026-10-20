@@ -1,0 +1,650 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Report Found Item";
+}
+
+<style>
+
+    .report-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px;
+        color: #123b61;
+    }
+
+    .report-header {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #72d3ee, #43b5df);
+        color: white;
+        border-radius: 28px;
+        padding: 42px 45px;
+        margin-bottom: 28px;
+        box-shadow: 0 12px 30px rgba(50, 157, 202, 0.14);
+    }
+
+        .report-header::after {
+            content: "";
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            right: -80px;
+            top: -150px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .report-header h1 {
+            position: relative;
+            z-index: 1;
+            margin: 0 0 8px;
+            font-size: 38px;
+            font-weight: 850;
+            letter-spacing: -0.8px;
+        }
+
+        .report-header p {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+    .report-card {
+        background: white;
+        border: 1px solid #d8e8f1;
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 10px 25px rgba(55, 111, 145, 0.055);
+    }
+
+    .form-title {
+        margin-bottom: 28px;
+    }
+
+        .form-title h2 {
+            margin: 0 0 6px;
+            color: #123b61;
+            font-size: 23px;
+            font-weight: 850;
+        }
+
+        .form-title p {
+            margin: 0;
+            color: #7890a4;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: #365873;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+    .form-control {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 16px;
+        border: 1px solid #d8e8f1;
+        border-radius: 13px;
+        background: #fafdff;
+        color: #254764;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s ease;
+        font-family: inherit;
+    }
+
+        .form-control::placeholder {
+            color: #9aabb8;
+        }
+
+        .form-control:hover {
+            border-color: #b9d9e7;
+        }
+
+        .form-control:focus {
+            border-color: #159dcc;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(21, 157, 204, 0.10);
+        }
+
+    textarea.form-control {
+        min-height: 130px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-top: 25px;
+        padding: 17px 19px;
+        border-radius: 15px;
+        background: #eef9fc;
+        border-left: 4px solid #159dcc;
+    }
+
+    .notice-icon {
+        width: 30px;
+        height: 30px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #d8f1f9;
+        color: #159dcc;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .notice-content strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #087ca7;
+        font-size: 14px;
+    }
+
+    .notice-content p {
+        margin: 0;
+        color: #5f7c91;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid #e5eef3;
+    }
+
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 13px 22px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 750;
+        transition: 0.2s ease;
+    }
+
+    .submit-button {
+        border: none;
+        background: #159dcc;
+        color: white;
+        cursor: pointer;
+    }
+
+        .submit-button:hover {
+            background: #118bb5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(21, 157, 204, 0.18);
+        }
+
+    .cancel-button {
+        background: white;
+        color: #159dcc;
+        border: 1px solid #159dcc;
+    }
+
+        .cancel-button:hover {
+            background: #159dcc;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+
+    /* =========================================
+           SUCCESS POPUP
+        ========================================== */
+
+    .success-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(18, 59, 97, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+    }
+
+    .success-modal {
+        width: 100%;
+        max-width: 430px;
+        background: white;
+        border-radius: 22px;
+        padding: 35px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(18, 59, 97, 0.20);
+        animation: successPopup 0.25s ease;
+    }
+
+    .success-icon {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #dff7ee;
+        color: #18a36b;
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+    .success-modal h2 {
+        margin: 0 0 8px;
+        color: #123b61;
+        font-size: 24px;
+        font-weight: 850;
+    }
+
+    .success-modal p {
+        margin: 0 0 25px;
+        color: #6c8497;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .success-button {
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        padding: 13px 20px;
+        background: #159dcc;
+        color: white;
+        font-size: 14px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+        .success-button:hover {
+            background: #118bb5;
+        }
+
+    @@keyframes successPopup {
+        from {
+            opacity: 0;
+            transform: scale(0.94);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+
+    /* =========================================
+           RESPONSIVE
+        ========================================== */
+
+    @@media (max-width: 800px) {
+
+        .report-page {
+            padding: 20px;
+        }
+
+        .report-header {
+            padding: 32px;
+        }
+
+            .report-header h1 {
+                font-size: 32px;
+            }
+
+        .report-card {
+            padding: 27px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+            grid-column: auto;
+        }
+    }
+
+
+    @@media (max-width: 600px) {
+
+        .report-page {
+            padding: 15px;
+        }
+
+        .report-header {
+            padding: 27px;
+            border-radius: 20px;
+        }
+
+            .report-header h1 {
+                font-size: 28px;
+            }
+
+            .report-header p {
+                font-size: 14px;
+            }
+
+        .report-card {
+            padding: 22px;
+            border-radius: 20px;
+        }
+
+        .form-title h2 {
+            font-size: 21px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .action-button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .success-modal {
+            padding: 28px 22px;
+        }
+    }
+
+</style>
+
+
+<div class="report-page">
+
+    <!-- =========================================
+         PAGE HEADER
+    ========================================== -->
+
+    <div class="report-header">
+
+        <h1>
+            Report Found Item
+        </h1>
+
+        <p>
+            Tell us about an item you found so its owner can have a chance to recover it.
+        </p>
+
+    </div>
+
+
+    <!-- =========================================
+         REPORT FORM
+    ========================================== -->
+
+    <div class="report-card">
+
+        <div class="form-title">
+
+            <h2>
+                Found Item Information
+            </h2>
+
+            <p>
+                Provide as much information as possible to help identify the item's owner.
+            </p>
+
+        </div>
+
+
+        <form method="post"
+              asp-controller="ReportFound"
+              asp-action="Index"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="text-danger" style="margin-bottom: 20px;"></div>
+
+            <div class="form-grid">
+
+                <!-- ITEM NAME -->
+
+                <div class="form-group">
+
+                    <label for="ItemName">
+                        Item Name
+                    </label>
+
+                    <input type="text"
+                           id="ItemName"
+                           name="Title"
+                           class="form-control"
+                           placeholder="Enter the name of the found item..." />
+
+                </div>
+
+
+                <!-- CATEGORY -->
+
+                <div class="form-group">
+
+                    <label for="CategoryID">
+                        Category
+                    </label>
+
+                    <select id="CategoryID"
+                            name="CategoryID"
+                            class="form-control"
+                            required>
+
+                        <option value="">
+                            Select a category
+                        </option>
+
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var cat in ViewBag.Categories)
+                            {
+                                <option value="@cat.CategoryID">
+                                    @cat.CategoryName
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- DATE FOUND -->
+
+                <div class="form-group">
+
+                    <label for="DateReported">
+                        Date Found
+                    </label>
+
+                    <input type="date"
+                           id="DateReported"
+                           name="DateReported"
+                           class="form-control" />
+
+                </div>
+
+
+                <!-- LOCATION FOUND -->
+
+                <div class="form-group">
+
+                    <label for="LocationFoundOrLost">
+                        Location Found
+                    </label>
+
+                    <input type="text"
+                           id="LocationFoundOrLost"
+                           name="LocationFound"
+                           class="form-control"
+                           placeholder="Where did you find the item?" />
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group full-width">
+
+                    <label for="Description">
+                        Description
+                    </label>
+
+                    <textarea id="Description"
+                              name="Description"
+                              class="form-control"
+                              placeholder="Describe the item, including its color, brand, markings, or other identifying details..."></textarea>
+
+                </div>
+
+
+                <!-- IMAGE UPLOAD -->
+
+                <div class="form-group full-width">
+
+                    <label for="ImageFile">
+                        Upload Image (Optional)
+                    </label>
+
+                    <input type="file"
+                           id="ImageFile"
+                           name="imageFile"
+                           class="form-control"
+                           accept="image/*" />
+
+                </div>
+
+            </div>
+
+
+            <!-- NOTICE -->
+
+            <div class="notice">
+
+                <div class="notice-icon">
+                    i
+                </div>
+
+                <div class="notice-content">
+
+                    <strong>
+                        Important
+                    </strong>
+
+                    <p>
+                        Please provide accurate information about where and when
+                        the item was found. This can help us identify its rightful owner.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="form-actions">
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="action-button cancel-button">
+
+                    Cancel
+
+                </a>
+
+
+                <button type="submit"
+                        class="action-button submit-button">
+
+                    Submit Report
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     SUCCESS POPUP
+========================================== -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="success-overlay" id="successOverlay">
+
+        <div class="success-modal">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <h2>
+                Report Submitted!
+            </h2>
+
+            <p>
+                @TempData["SuccessMessage"]
+            </p>
+
+            <button type="button"
+                    class="success-button"
+                    onclick="closeSuccessPopup()">
+
+                OK
+
+            </button>
+
+        </div>
+
+    </div>
+}
+
+
+<script>
+
+    function closeSuccessPopup() {
+
+        const popup = document.getElementById("successOverlay");
+
+        if (popup) {
+            popup.remove();
+        }
+
+    }
+
+</script>

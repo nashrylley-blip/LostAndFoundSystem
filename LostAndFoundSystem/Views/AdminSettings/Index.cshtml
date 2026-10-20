@@ -1,0 +1,598 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admin Settings";
+}
+
+<style>
+    .admin-page {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 28px 28px 50px;
+        color: #17324d;
+    }
+
+    /* =========================
+       PAGE HEADER
+       ========================= */
+
+    .page-header {
+        position: relative;
+        min-height: 205px;
+        padding: 36px 42px;
+        margin-bottom: 28px;
+        border-radius: 28px;
+        overflow: hidden;
+
+        background:
+            radial-gradient(
+                circle at 90% 10%,
+                rgba(255,255,255,.22),
+                transparent 25%
+            ),
+            radial-gradient(
+                circle at 78% 100%,
+                rgba(255,255,255,.13),
+                transparent 25%
+            ),
+            linear-gradient(
+                135deg,
+                #72d3ee 0%,
+                #43b5df 55%,
+                #159dcc 100%
+            );
+
+        box-shadow: 0 18px 38px rgba(24, 145, 188, .18);
+
+        display: flex;
+        align-items: center;
+    }
+
+    .page-header::before {
+        content: "";
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        right: -65px;
+        top: -105px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.22);
+    }
+
+    .page-header::after {
+        content: "";
+        position: absolute;
+        width: 175px;
+        height: 175px;
+        right: 120px;
+        bottom: -115px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .page-header-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+    }
+
+    .page-header h1 {
+        margin: 0 0 10px;
+        font-size: 38px;
+        line-height: 1.1;
+        font-weight: 900;
+        letter-spacing: -.03em;
+    }
+
+    .page-header p {
+        margin: 0;
+        max-width: 680px;
+        font-size: 14px;
+        line-height: 1.7;
+        color: rgba(255,255,255,.94);
+    }
+
+    /* =========================
+       SETTINGS CONTAINER
+       ========================= */
+
+    .settings-container {
+        background: #ffffff;
+        border: 1px solid #e7eef5;
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 8px 24px rgba(28, 61, 91, .05);
+    }
+
+    /* =========================
+       SETTINGS TITLE
+       ========================= */
+
+    .settings-title {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+
+        border-bottom: 1px solid #edf2f6;
+        padding-bottom: 20px;
+        margin-bottom: 25px;
+    }
+
+    .settings-title-icon {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+        border-radius: 13px;
+        background: #e9f8fc;
+        color: #159dcc;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .settings-title-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .settings-title h2 {
+        margin: 0 0 3px;
+        color: #17324d;
+        font-size: 20px;
+        font-weight: 850;
+    }
+
+    .settings-title p {
+        margin: 0;
+        color: #8497a8;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    /* =========================
+       SETTINGS LIST
+       ========================= */
+
+    .settings-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .setting-card {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+
+        padding: 18px;
+
+        border: 1px solid #e7eef5;
+        border-radius: 17px;
+        background: #ffffff;
+
+        transition:
+            border-color .18s ease,
+            box-shadow .18s ease,
+            transform .18s ease;
+    }
+
+    .setting-card:hover {
+        border-color: #ccebf4;
+        box-shadow: 0 8px 20px rgba(28, 61, 91, .06);
+        transform: translateY(-1px);
+    }
+
+    .setting-icon {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+
+        border-radius: 14px;
+        background: #eef9fc;
+        color: #159dcc;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .setting-icon svg {
+        width: 23px;
+        height: 23px;
+    }
+
+    .setting-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .setting-title {
+        margin-bottom: 5px;
+        color: #17324d;
+        font-size: 15px;
+        font-weight: 850;
+    }
+
+    .setting-description {
+        color: #7d90a1;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .setting-status {
+        flex-shrink: 0;
+
+        padding: 7px 12px;
+        border-radius: 20px;
+
+        background: #f1f6f9;
+        color: #7890a2;
+
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    /* =========================
+       BACK BUTTON
+       ========================= */
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        margin-top: 22px;
+        min-height: 42px;
+        padding: 0 18px;
+
+        background: #ffffff;
+        border: 1px solid #dce7ef;
+        color: #60788c;
+
+        text-decoration: none;
+        border-radius: 11px;
+        font-size: 12px;
+        font-weight: 800;
+
+        transition:
+            background .18s ease,
+            border-color .18s ease,
+            color .18s ease,
+            transform .18s ease;
+    }
+
+    .back-button:hover {
+        background: #eef9fc;
+        border-color: #b9e5f2;
+        color: #159dcc;
+        transform: translateY(-1px);
+    }
+
+    /* =========================
+       RESPONSIVE
+       ========================= */
+
+    @@media (max-width: 700px) {
+
+        .admin-page {
+            padding: 22px 18px 40px;
+        }
+
+        .page-header {
+            min-height: auto;
+            padding: 30px 26px;
+            border-radius: 23px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+        }
+
+        .page-header p {
+            font-size: 13px;
+        }
+
+        .settings-container {
+            padding: 20px;
+            border-radius: 21px;
+        }
+
+        .setting-card {
+            align-items: flex-start;
+        }
+
+        .setting-status {
+            display: none;
+        }
+
+        .back-button {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 450px) {
+
+        .admin-page {
+            padding: 18px 14px 35px;
+        }
+
+        .page-header {
+            padding: 26px 21px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .settings-container {
+            padding: 17px;
+        }
+
+        .settings-title h2 {
+            font-size: 18px;
+        }
+
+        .settings-title-icon {
+            width: 40px;
+            height: 40px;
+            flex-basis: 40px;
+        }
+
+        .setting-card {
+            gap: 13px;
+            padding: 15px;
+        }
+
+        .setting-icon {
+            width: 43px;
+            height: 43px;
+            flex-basis: 43px;
+        }
+
+        .setting-title {
+            font-size: 14px;
+        }
+
+        .setting-description {
+            font-size: 11px;
+        }
+    }
+</style>
+
+
+<div class="admin-page">
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <div class="page-header-content">
+
+            <h1>
+                Admin Settings
+            </h1>
+
+            <p>
+                Manage system settings and administrator preferences.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SETTINGS CONTAINER -->
+
+    <div class="settings-container">
+
+        <div class="settings-title">
+
+            <div class="settings-title-icon">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2v-.48a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.42-1.42.06-.06A1.7 1.7 0 0 0 8.4 15a1.7 1.7 0 0 0-1.56-1.03H6v-2h.84A1.7 1.7 0 0 0 8.4 10.94a1.7 1.7 0 0 0-.34-1.88L8 9l1.42-1.42.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12.39 6.4V6h2v.4a1.7 1.7 0 0 0 1.03 1.58 1.7 1.7 0 0 0 1.88-.34l.06-.06L18.78 9l-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 19.94 12H20v2h-.6A1.7 1.7 0 0 0 19.4 15z" />
+
+                </svg>
+
+            </div>
+
+            <div>
+
+                <h2>
+                    System Settings
+                </h2>
+
+                <p>
+                    Configuration options for the Campus Lost &amp; Found System.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="settings-list">
+
+
+            <!-- ACCOUNT SETTINGS -->
+
+            <div class="setting-card">
+
+                <div class="setting-icon">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+
+                    </svg>
+
+                </div>
+
+                <div class="setting-content">
+
+                    <div class="setting-title">
+                        Administrator Account
+                    </div>
+
+                    <div class="setting-description">
+                        Manage administrator account information and access.
+                    </div>
+
+                </div>
+
+                <div class="setting-status">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- SYSTEM SETTINGS -->
+
+            <div class="setting-card">
+
+                <div class="setting-icon">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2v-.48a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.42-1.42.06-.06A1.7 1.7 0 0 0 8.4 15a1.7 1.7 0 0 0-1.56-1.03H6v-2h.84A1.7 1.7 0 0 0 8.4 10.94a1.7 1.7 0 0 0-.34-1.88L8 9l1.42-1.42.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12.39 6.4V6h2v.4a1.7 1.7 0 0 0 1.03 1.58 1.7 1.7 0 0 0 1.88-.34l.06-.06L18.78 9l-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 19.94 12H20v2h-.6A1.7 1.7 0 0 0 19.4 15z" />
+
+                    </svg>
+
+                </div>
+
+                <div class="setting-content">
+
+                    <div class="setting-title">
+                        System Configuration
+                    </div>
+
+                    <div class="setting-description">
+                        Configure general settings for the Lost &amp; Found system.
+                    </div>
+
+                </div>
+
+                <div class="setting-status">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- NOTIFICATION SETTINGS -->
+
+            <div class="setting-card">
+
+                <div class="setting-icon">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                        <path d="M10 21h4" />
+
+                    </svg>
+
+                </div>
+
+                <div class="setting-content">
+
+                    <div class="setting-title">
+                        Notification Settings
+                    </div>
+
+                    <div class="setting-description">
+                        Manage how system notifications are handled.
+                    </div>
+
+                </div>
+
+                <div class="setting-status">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- SECURITY SETTINGS -->
+
+            <div class="setting-card">
+
+                <div class="setting-icon">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <rect x="5" y="11" width="14" height="10" rx="2" />
+                        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                        <path d="M12 15v3" />
+
+                    </svg>
+
+                </div>
+
+                <div class="setting-content">
+
+                    <div class="setting-title">
+                        Security Settings
+                    </div>
+
+                    <div class="setting-description">
+                        Manage security and access control options.
+                    </div>
+
+                </div>
+
+                <div class="setting-status">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- BACK BUTTON -->
+
+    <a asp-controller="Admin"
+       asp-action="Index"
+       class="back-button">
+
+        <span>←</span>
+        Back to Admin Dashboard
+
+    </a>
+
+</div>

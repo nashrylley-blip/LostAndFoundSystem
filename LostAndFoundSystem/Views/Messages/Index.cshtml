@@ -1,0 +1,89 @@
+@model List<LostAndFoundSystem.Models.Conversation>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Messages";
+}
+
+<style>
+    .msg-page { max-width: 1000px; margin: 0 auto; padding: 30px; color: #17324d; }
+    .msg-header {
+        background: linear-gradient(135deg, #72d3ee, #43b5df); color: white;
+        border-radius: 28px; padding: 36px 40px; margin-bottom: 24px;
+        box-shadow: 0 12px 30px rgba(50,157,202,0.14);
+        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    .msg-header h1 { margin: 0 0 6px; font-size: 32px; font-weight: 900; }
+    .msg-header p { margin: 0; opacity: .95; font-size: 14px; }
+    .btn-new {
+        padding: 12px 22px; border-radius: 12px; background: white; color: #159dcc;
+        font-weight: 800; font-size: 13px; text-decoration: none; border: none;
+    }
+    .btn-new:hover { background: #f0f9fc; }
+    .alert-success { background: #e8f8ef; color: #1a7a45; border: 1px solid #b8e6c9; padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; font-weight: 600; }
+    .conv-list { display: flex; flex-direction: column; gap: 12px; }
+    .conv-card {
+        background: white; border: 1px solid #e0edf5; border-radius: 18px; padding: 20px 22px;
+        box-shadow: 0 6px 18px rgba(28,61,91,.05); text-decoration: none; color: inherit;
+        display: block; transition: transform .15s, box-shadow .15s;
+    }
+    .conv-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(28,61,91,.09); }
+    .conv-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 12px; }
+    .conv-subject { margin: 0; font-size: 16px; font-weight: 800; color: #17324d; }
+    .badge { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .badge-open { background: #e8f8ef; color: #1a7a45; }
+    .badge-closed { background: #eef3f8; color: #7890a4; }
+    .conv-preview { margin: 0 0 8px; font-size: 13px; color: #5a7388; }
+    .conv-meta { font-size: 12px; color: #94a8b8; font-weight: 600; }
+    .empty { text-align: center; padding: 60px 20px; background: white; border-radius: 20px; border: 1px solid #e0edf5; color: #7890a4; }
+    .empty h3 { margin: 0 0 8px; color: #17324d; font-weight: 800; }
+</style>
+
+<div class="msg-page">
+    <div class="msg-header">
+        <div>
+            <h1>Messages</h1>
+            <p>Chat with the administrator about concerns or questions.</p>
+        </div>
+        <a asp-action="Create" class="btn-new">+ New Message</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty">
+            <h3>No conversations yet</h3>
+            <p>Start a conversation with the admin if you have concerns.</p>
+        </div>
+    }
+    else
+    {
+        <div class="conv-list">
+            @foreach (var c in Model)
+            {
+                var lastMsg = c.Messages?.OrderByDescending(m => m.CreatedAt).FirstOrDefault();
+                var unread = c.Messages?.Count(m => !m.IsRead && m.SenderUserID != c.StudentUserID) ?? 0;
+                <a asp-action="Chat" asp-route-id="@c.ConversationID" class="conv-card">
+                    <div class="conv-top">
+                        <h3 class="conv-subject">
+                            @c.Subject
+                            @if (unread > 0)
+                            {
+                                <span style="background:#159dcc;color:white;font-size:11px;padding:2px 8px;border-radius:999px;margin-left:6px;">@unread new</span>
+                            }
+                        </h3>
+                        <span class="badge @(c.Status == "Open" ? "badge-open" : "badge-closed")">@c.Status</span>
+                    </div>
+                    @if (lastMsg != null)
+                    {
+                        <p class="conv-preview">@(lastMsg.Body.Length > 100 ? lastMsg.Body.Substring(0, 100) + "…" : lastMsg.Body)</p>
+                    }
+                    <div class="conv-meta">Updated @c.UpdatedAt.ToString("MMM dd, yyyy · hh:mm tt")</div>
+                </a>
+            }
+        </div>
+    }
+</div>

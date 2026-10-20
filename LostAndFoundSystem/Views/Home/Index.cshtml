@@ -1,0 +1,1333 @@
+﻿@model LostAndFoundSystem.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+
+    /* =========================================================
+       DASHBOARD
+    ========================================================= */
+
+    .dashboard-page {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 28px 28px 50px;
+        color: #17324d;
+    }
+
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+
+    .dashboard-hero {
+        min-height: 240px;
+        border-radius: 28px;
+        padding: 38px 42px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 28px;
+
+        background:
+            radial-gradient(
+                circle at 90% 15%,
+                rgba(255,255,255,0.30) 0,
+                rgba(255,255,255,0.08) 28%,
+                transparent 50%
+            ),
+            linear-gradient(
+                135deg,
+                #8bdcf7 0%,
+                #58bfe9 45%,
+                #349bd5 100%
+            );
+
+        box-shadow: 0 18px 40px rgba(53, 151, 198, 0.20);
+    }
+
+
+    .dashboard-hero::before {
+        content: "";
+        position: absolute;
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        right: -110px;
+        top: -180px;
+        background: rgba(255,255,255,0.18);
+    }
+
+
+    .dashboard-hero::after {
+        content: "";
+        position: absolute;
+        width: 270px;
+        height: 270px;
+        border-radius: 50%;
+        left: 48%;
+        bottom: -190px;
+        background: rgba(255,255,255,0.13);
+    }
+
+
+    .hero-content {
+        position: relative;
+        z-index: 5;
+        max-width: 720px;
+    }
+
+
+    .hero-title {
+        color: white;
+        font-size: 42px;
+        font-weight: 900;
+        letter-spacing: -1.5px;
+        margin-bottom: 3px;
+    }
+
+
+    .hero-subtitle {
+        color: white;
+        font-size: 24px;
+        font-weight: 750;
+        margin-bottom: 13px;
+    }
+
+
+    .hero-description {
+        color: rgba(255,255,255,0.93);
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 620px;
+        margin: 0;
+    }
+
+
+    .hero-decoration {
+        position: absolute;
+        right: 42px;
+        bottom: 28px;
+        z-index: 4;
+        color: rgba(255,255,255,0.95);
+        font-size: 17px;
+        font-style: italic;
+        transform: rotate(-4deg);
+        text-align: center;
+    }
+
+
+    .hero-decoration::after {
+        content: "";
+        display: block;
+        width: 85px;
+        height: 3px;
+        background: white;
+        border-radius: 20px;
+        transform: rotate(-3deg);
+        margin: 8px auto 0;
+        opacity: 0.8;
+    }
+
+
+    .hero-shape {
+        position: absolute;
+        right: 18%;
+        bottom: 20px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.12);
+    }
+
+
+    /* =========================================================
+       MAIN GRID
+    ========================================================= */
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 310px;
+        gap: 24px;
+        align-items: start;
+    }
+
+
+    /* =========================================================
+       SECTION HEADINGS
+    ========================================================= */
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
+
+    .section-heading h2 {
+        font-size: 20px;
+        color: #173b59;
+        font-weight: 850;
+        margin: 0;
+    }
+
+
+    .section-heading a {
+        color: #2997cf;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+
+    .section-heading a:hover {
+        color: #1478ad;
+    }
+
+
+    /* =========================================================
+       QUICK ACTIONS
+    ========================================================= */
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 26px;
+    }
+
+
+    .action-card {
+        background: rgba(255,255,255,0.95);
+        border: 1px solid #deebf2;
+        border-radius: 21px;
+        padding: 20px 18px;
+        min-height: 155px;
+
+        text-decoration: none;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        transition: 0.25s ease;
+
+        box-shadow: 0 7px 20px rgba(43, 117, 153, 0.05);
+    }
+
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        border-color: #a9daf0;
+        box-shadow: 0 16px 30px rgba(43, 117, 153, 0.12);
+    }
+
+
+    /* =========================================================
+       ACTION ICON
+    ========================================================= */
+
+    .action-icon {
+        width: 49px;
+        height: 49px;
+        border-radius: 16px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 14px;
+    }
+
+
+    .action-icon svg {
+        width: 25px;
+        height: 25px;
+        stroke-width: 1.9;
+    }
+
+
+    /* LOST */
+
+    .action-card:nth-child(1) .action-icon {
+        background: #e9f7ff;
+    }
+
+
+    .action-card:nth-child(1) .action-icon svg {
+        stroke: #e66b4c;
+    }
+
+
+    /* FOUND */
+
+    .action-card:nth-child(2) .action-icon {
+        background: #e8f8f8;
+    }
+
+
+    .action-card:nth-child(2) .action-icon svg {
+        stroke: #249fa8;
+    }
+
+
+    /* SEARCH */
+
+    .action-card:nth-child(3) .action-icon {
+        background: #eaf2ff;
+    }
+
+
+    .action-card:nth-child(3) .action-icon svg {
+        stroke: #3984d6;
+    }
+
+
+    /* NOTIFICATION */
+
+    .action-card:nth-child(4) .action-icon {
+        background: #edf4ff;
+    }
+
+
+    .action-card:nth-child(4) .action-icon svg {
+        stroke: #6d72d9;
+    }
+
+
+    .action-title {
+        color: #173b59;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+
+    .action-description {
+        color: #8396a5;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+
+    .action-arrow {
+        align-self: flex-end;
+
+        width: 30px;
+        height: 30px;
+
+        border-radius: 50%;
+
+        background: #eef8fd;
+        color: #2997cf;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 16px;
+        font-weight: 700;
+
+        margin-top: 10px;
+    }
+
+
+    /* =========================================================
+       RECENT LISTINGS
+    ========================================================= */
+
+    .recent-section {
+        background: rgba(255,255,255,0.96);
+        border: 1px solid #deebf2;
+        border-radius: 23px;
+        padding: 23px;
+        min-height: 275px;
+
+        box-shadow: 0 7px 20px rgba(43, 117, 153, 0.05);
+    }
+
+
+    .empty-listing {
+        min-height: 190px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        text-align: center;
+        padding: 25px;
+    }
+
+
+    .empty-icon {
+        width: 66px;
+        height: 66px;
+        border-radius: 21px;
+
+        background: #edf8fd;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 13px;
+    }
+
+
+    .empty-icon svg {
+        width: 32px;
+        height: 32px;
+        stroke: #4aa8d8;
+        stroke-width: 1.7;
+    }
+
+
+    .empty-listing h3 {
+        color: #254764;
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+
+    .empty-listing p {
+        color: #8498a8;
+        font-size: 12px;
+        max-width: 400px;
+        margin-bottom: 15px;
+    }
+
+
+    .empty-action {
+        background: #399fd4;
+        color: white;
+
+        text-decoration: none;
+
+        border-radius: 11px;
+        padding: 10px 19px;
+
+        font-size: 12px;
+        font-weight: 750;
+
+        transition: 0.2s ease;
+    }
+
+
+    .empty-action:hover {
+        background: #2189bf;
+        color: white;
+    }
+
+
+    /* =========================================================
+       RIGHT COLUMN
+    ========================================================= */
+
+    .side-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+
+    .side-card {
+        background: rgba(255,255,255,0.96);
+        border: 1px solid #deebf2;
+        border-radius: 22px;
+        padding: 22px;
+
+        box-shadow: 0 7px 20px rgba(43, 117, 153, 0.05);
+    }
+
+
+    .side-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 17px;
+    }
+
+
+    .side-card-header h3 {
+        margin: 0;
+        color: #173b59;
+        font-size: 17px;
+        font-weight: 850;
+    }
+
+
+    .side-card-header a {
+        color: #2997cf;
+        font-size: 11px;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+
+    /* =========================================================
+       REPORT SUMMARY
+    ========================================================= */
+
+    .report-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 13px 0;
+
+        border-top: 1px solid #edf3f7;
+    }
+
+
+    .report-item:first-of-type {
+        border-top: none;
+    }
+
+
+    .report-icon {
+        width: 39px;
+        height: 39px;
+
+        border-radius: 13px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+    }
+
+
+    .report-icon svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 1.8;
+    }
+
+
+    .report-item:nth-child(2) .report-icon {
+        background: #edf6ff;
+    }
+
+
+    .report-item:nth-child(2) .report-icon svg {
+        stroke: #5578cf;
+    }
+
+
+    .report-item:nth-child(3) .report-icon {
+        background: #eaf9f7;
+    }
+
+
+    .report-item:nth-child(3) .report-icon svg {
+        stroke: #38a59b;
+    }
+
+
+    .report-item:nth-child(4) .report-icon {
+        background: #eef4f8;
+    }
+
+
+    .report-item:nth-child(4) .report-icon svg {
+        stroke: #607d95;
+    }
+
+
+    .report-label {
+        color: #456176;
+        font-size: 12px;
+        font-weight: 700;
+        flex: 1;
+    }
+
+
+    .report-number {
+        color: #173b59;
+        font-size: 17px;
+        font-weight: 850;
+    }
+
+
+    /* =========================================================
+       NOTIFICATIONS
+    ========================================================= */
+
+    .notification-empty {
+        text-align: center;
+        padding: 20px 10px 8px;
+    }
+
+
+    .notification-empty-icon {
+        width: 58px;
+        height: 58px;
+
+        border-radius: 18px;
+
+        background: #edf6ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin: 0 auto 12px;
+    }
+
+
+    .notification-empty-icon svg {
+        width: 28px;
+        height: 28px;
+        stroke: #5d75d4;
+        stroke-width: 1.7;
+    }
+
+
+    .notification-empty p {
+        color: #8195a5;
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+
+    /* =========================================================
+       REMINDER
+    ========================================================= */
+
+    .reminder-card {
+        background: linear-gradient(
+            135deg,
+            #edf9ff,
+            #f8fcff
+        );
+
+        border: 1px solid #d8edf8;
+        border-radius: 21px;
+
+        padding: 20px;
+
+        display: flex;
+        align-items: center;
+
+        gap: 15px;
+
+        margin-top: 24px;
+    }
+
+
+    .reminder-icon {
+        width: 49px;
+        height: 49px;
+
+        border-radius: 16px;
+
+        background: white;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        box-shadow: 0 5px 15px rgba(45, 124, 160, 0.08);
+    }
+
+
+    .reminder-icon svg {
+        width: 25px;
+        height: 25px;
+        stroke: #f0a94b;
+        stroke-width: 1.8;
+    }
+
+
+    .reminder-content strong {
+        display: block;
+        color: #286080;
+        font-size: 14px;
+        margin-bottom: 3px;
+    }
+
+
+    .reminder-content span {
+        color: #718b9d;
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @@media (max-width: 1200px) {
+
+        .dashboard-grid {
+            grid-template-columns: minmax(0, 1fr) 280px;
+        }
+
+        .quick-actions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .dashboard-hero {
+            min-height: 220px;
+        }
+    }
+
+
+    @@media (max-width: 950px) {
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .side-column {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .reminder-card {
+            margin-top: 20px;
+        }
+    }
+
+
+    @@media (max-width: 700px) {
+
+        .dashboard-page {
+            padding: 18px 14px 35px;
+        }
+
+        .dashboard-hero {
+            padding: 30px 25px;
+            min-height: 220px;
+        }
+
+        .hero-title {
+            font-size: 33px;
+        }
+
+        .hero-subtitle {
+            font-size: 21px;
+        }
+
+        .hero-decoration,
+        .hero-shape {
+            display: none;
+        }
+
+        .quick-actions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .side-column {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
+    @@media (max-width: 450px) {
+
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .action-card {
+            min-height: 130px;
+        }
+
+        .dashboard-hero {
+            border-radius: 19px;
+        }
+
+        .recent-section,
+        .side-card {
+            border-radius: 19px;
+        }
+    }
+
+</style>
+
+
+<div class="dashboard-page">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="dashboard-hero">
+
+        <div class="hero-content">
+
+            <div class="hero-title">
+                Lost &amp; Found
+            </div>
+
+            <div class="hero-subtitle">
+                Small things. Big stories.
+            </div>
+
+            <p class="hero-description">
+                Report lost or found items, search for belongings,
+                and help make our campus a safer place.
+            </p>
+
+        </div>
+
+
+        <div class="hero-shape"></div>
+
+
+        <div class="hero-decoration">
+
+            Together for<br />
+
+            a safer campus
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN GRID
+    ====================================================== -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- =================================================
+             LEFT COLUMN
+        ================================================== -->
+
+        <div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="section-heading">
+
+                <h2>
+                    Quick Actions
+                </h2>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+
+                <!-- REPORT LOST -->
+
+                <a asp-controller="ReportLost"
+                   asp-action="Index"
+                   class="action-card">
+
+                    <div>
+
+                        <div class="action-icon">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+
+                                <polyline points="14 2 14 8 20 8"></polyline>
+
+                                <line x1="8" y1="13" x2="13" y2="13"></line>
+
+                                <line x1="8" y1="17" x2="11" y2="17"></line>
+
+                                <path d="M16 14l3-3 2 2-3 3-3 1z"></path>
+
+                            </svg>
+
+                        </div>
+
+
+                        <div class="action-title">
+                            Report Lost Item
+                        </div>
+
+                        <div class="action-description">
+                            Let us help you find it.
+                        </div>
+
+                    </div>
+
+
+                    <div class="action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+
+                <!-- REPORT FOUND -->
+
+                <a asp-controller="ReportFound"
+                   asp-action="Index"
+                   class="action-card">
+
+                    <div>
+
+                        <div class="action-icon">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+
+                                <path d="M7.5 4.21l9 5.19"></path>
+
+                            </svg>
+
+                        </div>
+
+
+                        <div class="action-title">
+                            Report Found Item
+                        </div>
+
+                        <div class="action-description">
+                            Help return it to the owner.
+                        </div>
+
+                    </div>
+
+
+                    <div class="action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+
+                <!-- SEARCH ITEMS -->
+
+                <a asp-controller="Find"
+                   asp-action="Index"
+                   class="action-card">
+
+                    <div>
+
+                        <div class="action-icon">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+
+                                <circle cx="11"
+                                        cy="11"
+                                        r="7">
+                                </circle>
+
+                                <line x1="16.65"
+                                      y1="16.65"
+                                      x2="21"
+                                      y2="21">
+                                </line>
+
+                            </svg>
+
+                        </div>
+
+
+                        <div class="action-title">
+                            Search Items
+                        </div>
+
+                        <div class="action-description">
+                            Find lost or found items.
+                        </div>
+
+                    </div>
+
+
+                    <div class="action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+
+                <!-- NOTIFICATIONS -->
+
+                <a asp-controller="Notifications"
+                   asp-action="Index"
+                   class="action-card">
+
+                    <div>
+
+                        <div class="action-icon">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+
+                                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+
+                                <path d="M10 21h4"></path>
+
+                            </svg>
+
+                        </div>
+
+
+                        <div class="action-title">
+                            View Notifications
+                        </div>
+
+                        <div class="action-description">
+                            Check your latest updates.
+                        </div>
+
+                    </div>
+
+
+                    <div class="action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 RECENT LISTINGS
+            ================================================== -->
+
+            <section class="recent-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Recent Listings
+                    </h2>
+
+                    <a asp-controller="Find"
+                       asp-action="Index">
+
+                        View All →
+
+                    </a>
+
+                </div>
+
+
+                <div class="empty-listing">
+
+
+                    <div class="empty-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+
+                            <line x1="12"
+                                  y1="22.08"
+                                  x2="12"
+                                  y2="12">
+                            </line>
+
+                        </svg>
+
+                    </div>
+
+
+                    <h3>
+                        No recent listings yet
+                    </h3>
+
+
+                    <p>
+                        Lost and found items will appear here
+                        once reports are submitted.
+                    </p>
+
+
+                    <a asp-controller="ReportLost"
+                       asp-action="Index"
+                       class="empty-action">
+
+                        Report an Item
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 REMINDER
+            ================================================== -->
+
+            <div class="reminder-card">
+
+                <div class="reminder-icon">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M9 18h6"></path>
+
+                        <path d="M10 22h4"></path>
+
+                        <path d="M12 2a7 7 0 0 0-4 12.74c.62.45 1 1.16 1 1.93V17h6v-.33c0-.77.38-1.48 1-1.93A7 7 0 0 0 12 2z"></path>
+
+                    </svg>
+
+                </div>
+
+
+                <div class="reminder-content">
+
+                    <strong>
+                        Remember
+                    </strong>
+
+                    <span>
+                        Provide clear item details and location
+                        when reporting a lost or found item.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             RIGHT COLUMN
+        ================================================== -->
+
+        <div class="side-column">
+
+
+            <!-- YOUR REPORTS -->
+
+            <section class="side-card">
+
+                <div class="side-card-header">
+
+                    <h3>
+                        Your Reports
+                    </h3>
+
+                    <a asp-controller="MyReports"
+                       asp-action="Index">
+
+                        View All
+
+                    </a>
+
+                </div>
+
+
+                <!-- LOST ITEMS -->
+
+                <div class="report-item">
+
+                    <div class="report-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+
+                            <polyline points="14 2 14 8 20 8"></polyline>
+
+                            <line x1="8"
+                                  y1="13"
+                                  x2="16"
+                                  y2="13">
+                            </line>
+
+                            <line x1="8"
+                                  y1="17"
+                                  x2="14"
+                                  y2="17">
+                            </line>
+
+                        </svg>
+
+                    </div>
+
+
+                    <div class="report-label">
+                        Lost Items
+                    </div>
+
+
+                    <div class="report-number">
+                        @Model.LostItems
+                    </div>
+
+                </div>
+
+
+                <!-- FOUND ITEMS -->
+
+                <div class="report-item">
+
+                    <div class="report-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+
+                            <line x1="12"
+                                  y1="22.08"
+                                  x2="12"
+                                  y2="12">
+                            </line>
+
+                        </svg>
+
+                    </div>
+
+
+                    <div class="report-label">
+                        Found Items
+                    </div>
+
+
+                    <div class="report-number">
+                        @Model.FoundItems
+                    </div>
+
+                </div>
+
+
+                <!-- RESOLVED -->
+
+                <div class="report-item">
+
+                    <div class="report-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <circle cx="12"
+                                    cy="12"
+                                    r="9">
+                            </circle>
+
+                            <polyline points="8 12 11 15 16 9"></polyline>
+
+                        </svg>
+
+                    </div>
+
+
+                    <div class="report-label">
+                        Resolved
+                    </div>
+
+
+                    <div class="report-number">
+                        @Model.ResolvedItems
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- NOTIFICATIONS -->
+
+            <section class="side-card">
+
+                <div class="side-card-header">
+
+                    <h3>
+                        Notifications
+                    </h3>
+
+                    <a asp-controller="Notifications"
+                       asp-action="Index">
+
+                        View All
+
+                    </a>
+
+                </div>
+
+
+                <div class="notification-empty">
+
+                    <div class="notification-empty-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+
+                            <path d="M10 21h4"></path>
+
+                        </svg>
+
+                    </div>
+
+
+                    <p>
+                        You're all caught up.
+                        New notifications will appear here.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>

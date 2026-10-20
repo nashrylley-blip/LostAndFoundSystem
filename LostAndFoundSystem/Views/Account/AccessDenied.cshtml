@@ -1,0 +1,59 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Access Denied";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied | Campus Lost &amp; Found</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 16px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #173b5b;
+            background: linear-gradient(135deg, #055b7d, #0e9ccc, #47c5e5);
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 38px 36px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(8, 60, 85, 0.30);
+        }
+
+        h1 { font-size: 26px; margin-bottom: 10px; color: #183e59; }
+
+        p { color: #8195a2; font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+
+        a {
+            display: inline-block;
+            padding: 12px 26px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #087ea4, #159dcc);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Access Denied</h1>
+        <p>You do not have permission to open this page with your current account.</p>
+        <a asp-controller="Account" asp-action="Logout">Back to Login</a>
+    </div>
+</body>
+</html>

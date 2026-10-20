@@ -1,0 +1,81 @@
+﻿@model IEnumerable<LostAndFoundSystem.Models.ItemClaim>
+
+@{
+    ViewData["Title"] = "Manage Item Claims";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Item Claims Management</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Item Title</th>
+                    <th>Claimed By (User ID)</th>
+                    <th>Proof / Remarks</th>
+                    <th>Date Claimed</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No claims submitted yet.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var claim in Model)
+                    {
+                        <tr>
+                            <td>#@claim.ClaimID</td>
+                            <td><strong>@(claim.Item?.Title ?? "N/A")</strong></td>
+                            <td>User #@claim.ClaimedByUserID</td>
+                            <td>@claim.ProofOfOwnership</td>
+                            <td>@claim.DateClaimed.ToString("MMM dd, yyyy - hh:mm tt")</td>
+                            <td>
+                                @if (claim.Status == "Approved")
+                                {
+                                    <span class="badge bg-success">Approved</span>
+                                }
+                                else if (claim.Status == "Rejected")
+                                {
+                                    <span class="badge bg-danger">Rejected</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                            </td>
+                            <td>
+                                @if (claim.Status == "Pending")
+                                {
+                                    <div class="d-flex gap-1">
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            <input type="hidden" name="claimId" value="@claim.ClaimID" />
+                                            <input type="hidden" name="status" value="Approved" />
+                                            <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                        </form>
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            <input type="hidden" name="claimId" value="@claim.ClaimID" />
+                                            <input type="hidden" name="status" value="Rejected" />
+                                            <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                        </form>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No action needed</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

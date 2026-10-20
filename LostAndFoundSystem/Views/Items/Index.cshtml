@@ -1,0 +1,70 @@
+﻿@model IEnumerable<LostAndFoundSystem.Models.Item>
+
+@{
+    ViewData["Title"] = "Lost & Found Items";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Lost & Found Items</h2>
+        <a asp-action="Create" class="btn btn-primary">+ Report New Item</a>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <form method="get" asp-action="Index" class="row g-3 mb-4">
+        <div class="col-md-6">
+            <input type="text" name="searchString" class="form-control" placeholder="Search item title or description..." />
+        </div>
+        <div class="col-md-4">
+            <select name="categoryId" class="form-select">
+                <option value="">All Categories</option>
+                @if (ViewBag.Categories != null)
+                {
+                    foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.CategoryID">@cat.CategoryName</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-secondary w-100">Search</button>
+        </div>
+    </form>
+
+    <!-- Item Cards Display -->
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center text-muted py-5">
+                <h4>No items found.</h4>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" style="height: 200px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="bg-light text-center py-5 text-muted" style="height: 200px;">No Image Available</div>
+                        }
+                        <div class="card-body">
+                            <span class="badge bg-info text-dark mb-2">@(item.Category?.CategoryName ?? "General")</span>
+                            <span class="badge @(item.Status == "Claimed" ? "bg-success" : "bg-warning text-dark") mb-2">@item.Status</span>
+                            <h5 class="card-title">@item.Title</h5>
+                            <p class="card-text text-truncate">@item.Description</p>
+                            <small class="text-muted d-block">Location: @item.LocationFound</small>
+                            <small class="text-muted d-block mb-3">Date: @item.DateReported.ToString("MMM dd, yyyy")</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,100 @@
+@model LostAndFoundSystem.Models.Conversation
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.Subject;
+    var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+}
+
+<style>
+    .chat-page { max-width: 900px; margin: 0 auto; padding: 30px; color: #17324d; }
+    .chat-header {
+        background: linear-gradient(135deg, #72d3ee, #43b5df); color: white;
+        border-radius: 24px; padding: 28px 32px; margin-bottom: 20px;
+        box-shadow: 0 12px 30px rgba(50,157,202,0.14);
+    }
+    .chat-header h1 { margin: 0 0 6px; font-size: 24px; font-weight: 900; }
+    .chat-header p { margin: 0; opacity: .95; font-size: 13px; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-top: 8px; }
+    .badge-open { background: rgba(255,255,255,.25); color: white; }
+    .badge-closed { background: rgba(0,0,0,.15); color: white; }
+    .chat-box {
+        background: white; border: 1px solid #e0edf5; border-radius: 24px;
+        box-shadow: 0 8px 24px rgba(28,61,91,.05); display: flex; flex-direction: column;
+        min-height: 420px; max-height: 560px;
+    }
+    .messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+    .bubble {
+        max-width: 75%; padding: 14px 18px; border-radius: 18px; font-size: 14px; line-height: 1.55;
+    }
+    .bubble.mine { align-self: flex-end; background: #159dcc; color: white; border-bottom-right-radius: 6px; }
+    .bubble.theirs { align-self: flex-start; background: #f0f5f9; color: #17324d; border-bottom-left-radius: 6px; }
+    .bubble-meta { font-size: 11px; margin-top: 6px; opacity: .75; font-weight: 600; }
+    .reply-bar {
+        border-top: 1px solid #eef3f8; padding: 16px 20px; display: flex; gap: 12px; align-items: flex-end;
+    }
+    .reply-bar textarea {
+        flex: 1; padding: 12px 14px; border-radius: 14px; border: 1px solid #d0e0ec;
+        font-size: 14px; resize: none; min-height: 48px; max-height: 120px; box-sizing: border-box;
+    }
+    .btn-send {
+        padding: 12px 22px; border-radius: 12px; border: none; background: #159dcc; color: white;
+        font-weight: 800; font-size: 13px; cursor: pointer; white-space: nowrap;
+    }
+    .btn-send:hover { background: #1289b3; }
+    .btn-back {
+        display: inline-block; margin-top: 16px; padding: 11px 20px; border-radius: 12px;
+        background: #f0f7fc; color: #159dcc; font-weight: 800; font-size: 13px; text-decoration: none;
+        border: 1px solid #d0e8f5;
+    }
+    .closed-note { padding: 16px 20px; background: #f7f9fb; color: #7890a4; font-size: 13px; font-weight: 600; text-align: center; border-top: 1px solid #eef3f8; }
+    .alert-danger { background: #fdecea; color: #b42318; border: 1px solid #f5c2c0; padding: 12px 16px; border-radius: 12px; margin-bottom: 14px; font-weight: 600; }
+</style>
+
+<div class="chat-page">
+    <div class="chat-header">
+        <h1>@Model.Subject</h1>
+        <p>Conversation with Administrator</p>
+        <span class="badge @(Model.Status == "Open" ? "badge-open" : "badge-closed")">@Model.Status</span>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="chat-box">
+        <div class="messages" id="chatMessages">
+            @foreach (var m in Model.Messages.OrderBy(x => x.CreatedAt))
+            {
+                var isMine = m.SenderUserID == currentUserId;
+                <div class="bubble @(isMine ? "mine" : "theirs")">
+                    <div>@m.Body</div>
+                    <div class="bubble-meta">
+                        @(isMine ? "You" : (m.Sender?.FullName ?? "Admin")) · @m.CreatedAt.ToString("MMM dd · hh:mm tt")
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.Status == "Open")
+        {
+            <form asp-action="Reply" method="post" class="reply-bar">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="conversationId" value="@Model.ConversationID" />
+                <textarea name="body" placeholder="Type your message..." required></textarea>
+                <button type="submit" class="btn-send">Send</button>
+            </form>
+        }
+        else
+        {
+            <div class="closed-note">This conversation has been closed by the administrator.</div>
+        }
+    </div>
+
+    <a asp-action="Index" class="btn-back">← Back to Messages</a>
+</div>
+
+<script>
+    var box = document.getElementById('chatMessages');
+    if (box) box.scrollTop = box.scrollHeight;
+</script>

@@ -1,0 +1,742 @@
+﻿@model List<LostAndFoundSystem.Models.Item>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Manage Reports";
+
+    string currentFilter = ViewBag.Filter ?? "Pending Reports";
+    int totalReports = ViewBag.TotalReports ?? Model.Count;
+}
+
+<style>
+    .admin-page {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 28px 28px 50px;
+        color: #17324d;
+    }
+
+    .page-header {
+        position: relative;
+        min-height: 205px;
+        padding: 36px 42px;
+        margin-bottom: 28px;
+        border-radius: 28px;
+        overflow: hidden;
+
+        background:
+            radial-gradient(circle at 90% 10%, rgba(255,255,255,.22), transparent 25%),
+            radial-gradient(circle at 78% 100%, rgba(255,255,255,.13), transparent 25%),
+            linear-gradient(135deg, #72d3ee 0%, #43b5df 55%, #159dcc 100%);
+
+        box-shadow: 0 18px 38px rgba(24,145,188,.18);
+
+        display: flex;
+        align-items: center;
+    }
+
+    .page-header::before {
+        content: "";
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        right: -65px;
+        top: -105px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.22);
+    }
+
+    .page-header::after {
+        content: "";
+        position: absolute;
+        width: 175px;
+        height: 175px;
+        right: 120px;
+        bottom: -115px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .page-header-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+    }
+
+    .page-header h1 {
+        margin: 0 0 10px;
+        font-size: 38px;
+        font-weight: 900;
+    }
+
+    .page-header p {
+        margin: 0;
+        max-width: 680px;
+        font-size: 14px;
+        line-height: 1.7;
+        color: rgba(255,255,255,.94);
+    }
+
+    .reports-container {
+        background: #fff;
+        border: 1px solid #e7eef5;
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 8px 24px rgba(28,61,91,.05);
+    }
+
+    .reports-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding-bottom: 20px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #edf2f6;
+    }
+
+    .reports-title-area {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .reports-title-icon {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+        border-radius: 13px;
+        background: #e9f8fc;
+        color: #159dcc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .reports-title-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .reports-top h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 850;
+        color: #17324d;
+    }
+
+    .reports-count {
+        margin-top: 3px;
+        font-size: 12px;
+        color: #8497a8;
+    }
+
+    .filter-area {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .filter-label {
+        font-size: 12px;
+        font-weight: 750;
+        color: #70869a;
+    }
+
+    .report-filter {
+        min-width: 190px;
+        padding: 10px 13px;
+        border: 1px solid #dce7ef;
+        border-radius: 11px;
+        background: #fff;
+        color: #4d6579;
+        font-size: 12px;
+        font-weight: 650;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .message {
+        margin-bottom: 20px;
+        padding: 13px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .success-message {
+        background: #edf9f1;
+        border: 1px solid #cfead8;
+        color: #27733e;
+    }
+
+    .error-message {
+        background: #fff2f2;
+        border: 1px solid #f0d2d2;
+        color: #b83e3e;
+    }
+
+    .reports-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e8eff4;
+        border-radius: 16px;
+    }
+
+    .reports-table {
+        width: 100%;
+        min-width: 1100px;
+        border-collapse: collapse;
+    }
+
+    .reports-table th {
+        padding: 15px 16px;
+        text-align: left;
+        background: #f7fafc;
+        border-bottom: 1px solid #e5edf3;
+        font-size: 11px;
+        font-weight: 850;
+        color: #70869a;
+        text-transform: uppercase;
+    }
+
+    .reports-table td {
+        padding: 16px;
+        border-bottom: 1px solid #edf2f6;
+        vertical-align: middle;
+        font-size: 13px;
+        color: #526b7f;
+    }
+
+    .reports-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .reports-table tbody tr:hover {
+        background: #fbfdfe;
+    }
+
+    .item-name {
+        font-weight: 800;
+        color: #17324d;
+    }
+
+    .student-name {
+        font-weight: 800;
+        color: #17324d;
+    }
+
+    .secondary-text {
+        margin-top: 3px;
+        font-size: 11px;
+        color: #8497a8;
+    }
+
+    .description {
+        max-width: 220px;
+        line-height: 1.5;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 75px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .pending {
+        background: #fff8e8;
+        color: #a87720;
+    }
+
+    .approved {
+        background: #edf8f1;
+        color: #31814a;
+    }
+
+    .rejected {
+        background: #fff1f1;
+        color: #c44949;
+    }
+
+    .item-lost {
+        background: #fff1f1;
+        color: #c44949;
+    }
+
+    .item-found {
+        background: #eef9f2;
+        color: #3d8c58;
+    }
+
+    .item-claimed {
+        background: #eef6ff;
+        color: #3973aa;
+    }
+
+    .actions {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 0 11px;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 800;
+        text-decoration: none;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .view-button {
+        background: #eef9fc;
+        border-color: #d2edf5;
+        color: #159dcc;
+    }
+
+    .empty-state {
+        min-height: 390px;
+        padding: 55px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 76px;
+        height: 76px;
+        margin-bottom: 20px;
+        border-radius: 22px;
+        background: #eef9fc;
+        color: #159dcc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 9px;
+        font-size: 17px;
+        font-weight: 850;
+        color: #17324d;
+    }
+
+    .empty-state p {
+        max-width: 520px;
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #7d90a1;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 22px;
+        min-height: 42px;
+        padding: 0 18px;
+        background: #fff;
+        border: 1px solid #dce7ef;
+        color: #60788c;
+        text-decoration: none;
+        border-radius: 11px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    @@media (max-width: 900px) {
+        .reports-top {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+    @@media (max-width: 700px) {
+        .admin-page {
+            padding: 22px 18px 40px;
+        }
+
+        .page-header {
+            padding: 30px 26px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+        }
+
+        .reports-container {
+            padding: 20px;
+        }
+
+        .filter-area {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .report-filter {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="admin-page">
+
+    <div class="page-header">
+        <div class="page-header-content">
+
+            <h1>
+                Manage Reports
+            </h1>
+
+            <p>
+                Review student Lost &amp; Found reports before they are officially posted.
+            </p>
+
+        </div>
+    </div>
+
+
+    <div class="reports-container">
+
+        <div class="reports-top">
+
+            <div class="reports-title-area">
+
+                <div class="reports-title-icon">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M6 3h9l3 3v15H6z" />
+                        <path d="M15 3v4h4" />
+                        <path d="M9 11h6" />
+                        <path d="M9 15h6" />
+                        <path d="M9 19h4" />
+
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h2>
+                        Submitted Reports
+                    </h2>
+
+                    <div class="reports-count">
+                        @totalReports @(totalReports == 1 ? "report" : "reports") found
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="filter-area">
+
+                <span class="filter-label">
+                    Filter:
+                </span>
+
+                <select class="report-filter"
+                        onchange="window.location.href='@Url.Action("Index", "ManageReports")?filter=' + encodeURIComponent(this.value)">
+
+                    @if (currentFilter == "Pending Reports")
+                    {
+                        <option selected value="Pending Reports">
+                            Pending Reports
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Pending Reports">
+                            Pending Reports
+                        </option>
+                    }
+
+                    @if (currentFilter == "Approved Reports")
+                    {
+                        <option selected value="Approved Reports">
+                            Approved Reports
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Approved Reports">
+                            Approved Reports
+                        </option>
+                    }
+
+                    @if (currentFilter == "Rejected Reports")
+                    {
+                        <option selected value="Rejected Reports">
+                            Rejected Reports
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Rejected Reports">
+                            Rejected Reports
+                        </option>
+                    }
+
+                    @if (currentFilter == "Lost Items")
+                    {
+                        <option selected value="Lost Items">
+                            Pending Lost Items
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Lost Items">
+                            Pending Lost Items
+                        </option>
+                    }
+
+                    @if (currentFilter == "Found Items")
+                    {
+                        <option selected value="Found Items">
+                            Pending Found Items
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Found Items">
+                            Pending Found Items
+                        </option>
+                    }
+
+                    @if (currentFilter == "All Reports")
+                    {
+                        <option selected value="All Reports">
+                            All Reports
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="All Reports">
+                            All Reports
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="message success-message">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="message error-message">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="reports-table-wrapper">
+
+                <table class="reports-table">
+
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Reported By</th>
+                            <th>Date Reported</th>
+                            <th>Item Status</th>
+                            <th>Approval</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var report in Model)
+                        {
+                            string approvalClass = report.ApprovalStatus switch
+                            {
+                                "Approved" => "approved",
+                                "Rejected" => "rejected",
+                                _ => "pending"
+                            };
+
+                            string itemStatusClass = report.Status switch
+                            {
+                                "Lost" => "item-lost",
+                                "Found" => "item-found",
+                                "Claimed" => "item-claimed",
+                                _ => "pending"
+                            };
+
+                            <tr>
+
+                                <td>
+                                    <div class="item-name">
+                                        @report.Title
+                                    </div>
+
+                                    <div class="secondary-text description">
+                                        @(string.IsNullOrWhiteSpace(report.Description)
+                                            ? "No description provided"
+                                            : report.Description)
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @(report.Category?.CategoryName ?? "General")
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(report.LocationFound)
+                                        ? "Not provided"
+                                        : report.LocationFound)
+                                </td>
+
+                                <td>
+
+                                    @if (report.ReportedByUser != null)
+                                    {
+                                        <div class="student-name">
+                                            @report.ReportedByUser.FullName
+                                        </div>
+
+                                        <div class="secondary-text">
+                                            @report.ReportedByUser.Email
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="student-name">
+                                            Unknown Student
+                                        </div>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @report.DateReported.ToString("MMM dd, yyyy")
+                                    </div>
+
+                                    <div class="secondary-text">
+                                        @report.DateReported.ToString("hh:mm tt")
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge @itemStatusClass">
+                                        @report.Status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge @approvalClass">
+                                        @report.ApprovalStatus
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <div class="actions">
+
+                                        <a asp-controller="ManageReports"
+                                           asp-action="Details"
+                                           asp-route-id="@report.ItemID"
+                                           class="action-button view-button">
+                                            View
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+
+                <div class="empty-icon">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M6 3h9l3 3v15H6z" />
+                        <path d="M15 3v4h4" />
+                        <path d="M9 11h6" />
+                        <path d="M9 15h4" />
+
+                    </svg>
+
+                </div>
+
+                <h3>
+                    No reports available
+                </h3>
+
+                <p>
+                    There are no reports matching the selected filter.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+
+    <a asp-controller="Admin"
+       asp-action="Index"
+       class="back-button">
+
+        <span>←</span>
+        Back to Admin Dashboard
+
+    </a>
+
+</div>

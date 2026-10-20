@@ -1,0 +1,10 @@
+bin/
+obj/
+.git/
+.gitignore
+*.user
+*.db
+*.db-shm
+*.db-wal
+**/node_modules/
+README.md

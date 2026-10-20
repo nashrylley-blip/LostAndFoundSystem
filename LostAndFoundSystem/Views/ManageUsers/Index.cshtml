@@ -1,0 +1,248 @@
+@model List<LostAndFoundSystem.Models.User>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Manage Users";
+    string currentFilter = ViewBag.Filter ?? "All Users";
+    string currentStatus = ViewBag.Status ?? "All";
+    string? search = ViewBag.Search;
+    int totalUsers = ViewBag.TotalUsers ?? Model?.Count ?? 0;
+    bool hasFilters = !string.IsNullOrEmpty(search) || currentFilter != "All Users" || currentStatus != "All";
+}
+
+<style>
+    .admin-page { max-width: 1500px; margin: 0 auto; padding: 28px 28px 50px; color: #17324d; }
+    .page-header {
+        position: relative; min-height: 180px; padding: 36px 42px; margin-bottom: 28px;
+        border-radius: 28px; overflow: hidden;
+        background: linear-gradient(135deg, #72d3ee 0%, #43b5df 55%, #159dcc 100%);
+        box-shadow: 0 18px 38px rgba(24,145,188,.18); display: flex; align-items: center;
+    }
+    .page-header-content { position: relative; z-index: 2; color: white; }
+    .page-header h1 { margin: 0 0 10px; font-size: 36px; font-weight: 900; letter-spacing: -.03em; }
+    .page-header p { margin: 0; max-width: 680px; font-size: 14px; line-height: 1.7; color: rgba(255,255,255,.94); }
+    .users-container {
+        background: #fff; border: 1px solid #e7eef5; border-radius: 25px; padding: 28px;
+        box-shadow: 0 8px 24px rgba(28,61,91,.05); margin-bottom: 24px;
+    }
+    .list-header { margin-bottom: 18px; }
+    .list-header h2 { margin: 0; font-size: 22px; font-weight: 900; }
+    .users-count { font-size: 13px; color: #7890a4; margin-top: 4px; }
+
+    .alert-success { background: #e8f8ef; color: #1a7a45; border: 1px solid #b8e6c9; padding: 14px 18px; border-radius: 14px; margin-bottom: 20px; font-weight: 600; }
+    .alert-danger { background: #fdecea; color: #b42318; border: 1px solid #f5c2c0; padding: 14px 18px; border-radius: 14px; margin-bottom: 20px; font-weight: 600; }
+
+    /* Search + filters */
+    .search-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; align-items: center; }
+    .search-input {
+        flex: 1; min-width: 240px; padding: 11px 16px; border-radius: 12px; border: 1px solid #d0e0ec;
+        font-size: 13px; color: #17324d; background: #f7fbfe;
+    }
+    .search-select {
+        padding: 11px 16px; border-radius: 12px; border: 1px solid #d0e0ec;
+        font-size: 13px; font-weight: 600; color: #17324d; background: #f7fbfe; cursor: pointer;
+    }
+    .btn-search {
+        padding: 11px 22px; border-radius: 12px; border: none; background: #159dcc; color: white;
+        font-weight: 800; font-size: 13px; cursor: pointer;
+    }
+    .btn-search:hover { background: #1189b3; }
+    .btn-clear {
+        padding: 11px 18px; border-radius: 12px; border: 1px solid #d0e0ec; background: white; color: #5a7388;
+        font-weight: 700; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn-clear:hover { background: #f3f9fd; }
+
+    /* Table */
+    .users-table { width: 100%; border-collapse: collapse; }
+    .users-table th {
+        text-align: left; padding: 12px 14px; font-size: 12px; font-weight: 800; text-transform: uppercase;
+        letter-spacing: .04em; color: #5a7388; border-bottom: 2px solid #e7eef5;
+    }
+    .users-table td { padding: 16px 14px; border-bottom: 1px solid #eef3f8; vertical-align: middle; font-size: 14px; }
+    .users-table tr:last-child td { border-bottom: none; }
+    .users-table tr.deactivated td { background: #fafbfc; }
+    .users-table tr.deactivated .user-id,
+    .users-table tr.deactivated .user-email { color: #94a8b8; }
+    .user-id { font-weight: 800; color: #17324d; }
+    .user-email { color: #35516a; }
+
+    .badge {
+        display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: .03em;
+    }
+    .badge-student { background: #e7f4ff; color: #1a6fb5; }
+    .badge-admin { background: #f0eaff; color: #6a3fc4; }
+    .badge-active { background: #e8f8ef; color: #1a7a45; }
+    .badge-deactivated { background: #fdecea; color: #b42318; }
+    .status-since { display: block; margin-top: 4px; font-size: 11px; color: #94a8b8; font-weight: 600; }
+
+    .btn-sm {
+        padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; border: none; cursor: pointer;
+    }
+    .btn-deactivate { background: #fff3df; color: #b26a00; }
+    .btn-deactivate:hover { background: #fde6bf; }
+    .btn-reactivate { background: #e8f8ef; color: #1a7a45; }
+    .btn-reactivate:hover { background: #d1f0df; }
+    .protected { font-size: 12px; color: #94a8b8; font-weight: 600; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #7890a4; }
+    .empty-state h3 { margin: 0 0 8px; color: #17324d; font-weight: 800; }
+
+    .back-button {
+        display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 14px;
+        background: #f0f7fc; color: #159dcc; font-weight: 800; font-size: 13px; text-decoration: none;
+        border: 1px solid #d0e8f5;
+    }
+    .back-button:hover { background: #e3f2fb; }
+</style>
+
+<div class="admin-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <h1>Manage Users</h1>
+            <p>View registered users. You can deactivate a student account so they can no longer log in, and reactivate it anytime. Their reports, claims, and messages are kept.</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="users-container">
+        <div class="list-header">
+            <h2>Registered Users</h2>
+            <div class="users-count">@totalUsers @(totalUsers == 1 ? "user" : "users") found</div>
+        </div>
+
+        <!-- Search + filters -->
+        <form method="get" asp-action="Index" class="search-bar">
+            <input type="text" name="q" value="@search" class="search-input" placeholder="Search by Student ID or email..." />
+
+            <select name="filter" class="search-select">
+                @foreach (var f in new[] { "All Users", "Students", "Administrators" })
+                {
+                    if (currentFilter == f)
+                    {
+                        <option value="@f" selected>@f</option>
+                    }
+                    else
+                    {
+                        <option value="@f">@f</option>
+                    }
+                }
+            </select>
+
+            <select name="status" class="search-select">
+                @foreach (var s in new[] { "All", "Active", "Deactivated" })
+                {
+                    if (currentStatus == s)
+                    {
+                        <option value="@s" selected>@(s == "All" ? "All statuses" : s)</option>
+                    }
+                    else
+                    {
+                        <option value="@s">@(s == "All" ? "All statuses" : s)</option>
+                    }
+                }
+            </select>
+
+            <button type="submit" class="btn-search">Search</button>
+            @if (hasFilters)
+            {
+                <a asp-action="Index" class="btn-clear">Clear</a>
+            }
+        </form>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <h3>@(hasFilters ? "No results found" : "No users yet")</h3>
+                <p>@(hasFilters ? "Try a different search or filter." : "Registered users will appear here.")</p>
+            </div>
+        }
+        else
+        {
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model)
+                    {
+                        <tr class="@(u.IsDeactivated ? "deactivated" : "")">
+                            <td class="user-id">@(string.IsNullOrWhiteSpace(u.StudentID) ? u.FullName : u.StudentID)</td>
+                            <td class="user-email">@u.Email</td>
+                            <td>
+                                <span class="badge @(u.Role == "Admin" ? "badge-admin" : "badge-student")">
+                                    @(u.Role == "Admin" ? "Administrator" : u.Role)
+                                </span>
+                            </td>
+                            <td>
+                                @if (u.IsDeactivated)
+                                {
+                                    <span class="badge badge-deactivated">Deactivated</span>
+                                    @if (u.DeactivatedAt.HasValue)
+                                    {
+                                        <span class="status-since">Since @u.DeactivatedAt.Value.ToString("MMM dd, yyyy")</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge badge-active">Active</span>
+                                }
+                            </td>
+                            <td>@u.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @if (u.Role == "Admin")
+                                {
+                                    <span class="protected">Protected</span>
+                                }
+                                else if (u.IsDeactivated)
+                                {
+                                    <form asp-action="Reactivate" method="post" style="display:inline;"
+                                          onsubmit="return confirm('Reactivate this account? The user will be able to log in again.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.UserID" />
+                                        <input type="hidden" name="filter" value="@currentFilter" />
+                                        <input type="hidden" name="status" value="@currentStatus" />
+                                        <input type="hidden" name="q" value="@search" />
+                                        <button type="submit" class="btn-sm btn-reactivate">Reactivate</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Deactivate" method="post" style="display:inline;"
+                                          onsubmit="return confirm('Deactivate this account? The user will no longer be able to log in. Their data is kept and you can reactivate them anytime.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.UserID" />
+                                        <input type="hidden" name="filter" value="@currentFilter" />
+                                        <input type="hidden" name="status" value="@currentStatus" />
+                                        <input type="hidden" name="q" value="@search" />
+                                        <button type="submit" class="btn-sm btn-deactivate">Deactivate</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <a asp-controller="Admin" asp-action="Index" class="back-button">
+        <span>←</span> Back to Admin Dashboard
+    </a>
+</div>

@@ -1,0 +1,65 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "New Message";
+}
+
+<style>
+    .msg-page { max-width: 700px; margin: 0 auto; padding: 30px; color: #17324d; }
+    .msg-header {
+        background: linear-gradient(135deg, #72d3ee, #43b5df); color: white;
+        border-radius: 28px; padding: 36px 40px; margin-bottom: 24px;
+        box-shadow: 0 12px 30px rgba(50,157,202,0.14);
+    }
+    .msg-header h1 { margin: 0 0 6px; font-size: 32px; font-weight: 900; }
+    .msg-header p { margin: 0; opacity: .95; font-size: 14px; }
+    .form-card {
+        background: white; border: 1px solid #e0edf5; border-radius: 24px; padding: 32px;
+        box-shadow: 0 8px 24px rgba(28,61,91,.05);
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 800; color: #5a7388; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .03em; }
+    .form-control {
+        width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #d0e0ec;
+        font-size: 14px; color: #17324d; background: #f7fbfe; box-sizing: border-box;
+    }
+    textarea.form-control { min-height: 140px; resize: vertical; }
+    .btn-send {
+        padding: 12px 28px; border-radius: 12px; border: none; background: #159dcc; color: white;
+        font-weight: 800; font-size: 14px; cursor: pointer;
+    }
+    .btn-send:hover { background: #1289b3; }
+    .btn-back {
+        display: inline-block; margin-right: 12px; padding: 12px 22px; border-radius: 12px;
+        background: #f0f7fc; color: #159dcc; font-weight: 800; font-size: 13px; text-decoration: none;
+        border: 1px solid #d0e8f5;
+    }
+    .alert-danger { background: #fdecea; color: #b42318; border: 1px solid #f5c2c0; padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; font-weight: 600; }
+</style>
+
+<div class="msg-page">
+    <div class="msg-header">
+        <h1>New Message</h1>
+        <p>Send a concern or question to the administrator.</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="form-card">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label>Subject</label>
+                <input type="text" name="subject" class="form-control" placeholder="e.g. Question about my lost ID" required maxlength="200" />
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea name="body" class="form-control" placeholder="Describe your concern..." required></textarea>
+            </div>
+            <a asp-action="Index" class="btn-back">Cancel</a>
+            <button type="submit" class="btn-send">Send Message</button>
+        </form>
+    </div>
+</div>

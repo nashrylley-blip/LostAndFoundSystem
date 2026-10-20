@@ -1,0 +1,103 @@
+@model List<LostAndFoundSystem.Models.Conversation>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admin Messages";
+    string filter = ViewBag.Filter ?? "All";
+}
+
+<style>
+    .msg-page { max-width: 1100px; margin: 0 auto; padding: 30px; color: #17324d; }
+    .msg-header {
+        background: linear-gradient(135deg, #72d3ee, #43b5df); color: white;
+        border-radius: 28px; padding: 36px 40px; margin-bottom: 24px;
+        box-shadow: 0 12px 30px rgba(50,157,202,0.14);
+    }
+    .msg-header h1 { margin: 0 0 6px; font-size: 32px; font-weight: 900; }
+    .msg-header p { margin: 0; opacity: .95; font-size: 14px; }
+    .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-btn {
+        padding: 10px 18px; border-radius: 12px; border: 1px solid #d0e0ec; background: white;
+        font-weight: 700; font-size: 13px; color: #5a7388; text-decoration: none;
+    }
+    .filter-btn.active { background: #159dcc; color: white; border-color: #159dcc; }
+    .alert-success { background: #e8f8ef; color: #1a7a45; border: 1px solid #b8e6c9; padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; font-weight: 600; }
+    .conv-list { display: flex; flex-direction: column; gap: 12px; }
+    .conv-card {
+        background: white; border: 1px solid #e0edf5; border-radius: 18px; padding: 20px 22px;
+        box-shadow: 0 6px 18px rgba(28,61,91,.05); text-decoration: none; color: inherit; display: block;
+    }
+    .conv-card:hover { box-shadow: 0 10px 24px rgba(28,61,91,.09); }
+    .conv-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 12px; }
+    .conv-subject { margin: 0; font-size: 16px; font-weight: 800; }
+    .badge { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .badge-closed { background: #eef3f8; color: #7890a4; }
+    .conv-meta { font-size: 12px; color: #94a8b8; font-weight: 600; }
+    .conv-preview { margin: 6px 0 0; font-size: 13px; color: #5a7388; }
+    .empty { text-align: center; padding: 60px 20px; background: white; border-radius: 20px; border: 1px solid #e0edf5; color: #7890a4; }
+    .empty h3 { margin: 0 0 8px; color: #17324d; font-weight: 800; }
+</style>
+
+<div class="msg-page">
+    <div class="msg-header">
+        <h1>Messages</h1>
+        <p>Conversations from students. Reply to their concerns here.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="filters">
+        @foreach (var f in new[] { "All", "Open", "Closed" })
+        {
+            <a asp-action="Index" asp-route-filter="@f" class="filter-btn @(filter == f ? "active" : "")">@f</a>
+        }
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty">
+            <h3>No conversations</h3>
+            <p>Student messages will appear here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="conv-list">
+            @foreach (var c in Model)
+            {
+                var lastMsg = c.Messages?.OrderByDescending(m => m.CreatedAt).FirstOrDefault();
+                var unread = c.Messages?.Count(m => !m.IsRead && m.SenderUserID == c.StudentUserID) ?? 0;
+                <a asp-action="Chat" asp-route-id="@c.ConversationID" class="conv-card">
+                    <div class="conv-top">
+                        <h3 class="conv-subject">
+                            @c.Subject
+                            @if (unread > 0)
+                            {
+                                <span style="background:#159dcc;color:white;font-size:11px;padding:2px 8px;border-radius:999px;margin-left:6px;">@unread new</span>
+                            }
+                        </h3>
+                        @* "Open" badge removed (the whole card is clickable). Only show a badge when the conversation is Closed. *@
+                        @if (c.Status == "Closed")
+                        {
+                            <span class="badge badge-closed">Closed</span>
+                        }
+                    </div>
+                    <div class="conv-meta">
+                        From: @(c.Student?.FullName ?? "Student")
+                        @if (!string.IsNullOrEmpty(c.Student?.StudentID))
+                        {
+                            <span> · @c.Student.StudentID</span>
+                        }
+                        · Updated @c.UpdatedAt.ToString("MMM dd, yyyy · hh:mm tt")
+                    </div>
+                    @if (lastMsg != null)
+                    {
+                        <p class="conv-preview">@(lastMsg.Body.Length > 120 ? lastMsg.Body.Substring(0, 120) + "…" : lastMsg.Body)</p>
+                    }
+                </a>
+            }
+        </div>
+    }
+</div>

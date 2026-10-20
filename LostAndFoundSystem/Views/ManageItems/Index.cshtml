@@ -1,0 +1,198 @@
+@model List<LostAndFoundSystem.Models.Item>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Manage Items";
+    string currentFilter = ViewBag.Filter ?? "All Items";
+    int totalItems = ViewBag.TotalItems ?? Model?.Count ?? 0;
+}
+
+<style>
+    .admin-page { max-width: 1500px; margin: 0 auto; padding: 28px 28px 50px; color: #17324d; }
+    .page-header {
+        position: relative; min-height: 180px; padding: 36px 42px; margin-bottom: 28px;
+        border-radius: 28px; overflow: hidden;
+        background: linear-gradient(135deg, #72d3ee 0%, #43b5df 55%, #159dcc 100%);
+        box-shadow: 0 18px 38px rgba(24,145,188,.18); display: flex; align-items: center;
+    }
+    .page-header-content { position: relative; z-index: 2; color: white; }
+    .page-header h1 { margin: 0 0 10px; font-size: 36px; font-weight: 900; letter-spacing: -.03em; }
+    .page-header p { margin: 0; max-width: 680px; font-size: 14px; line-height: 1.7; color: rgba(255,255,255,.94); }
+    .items-container {
+        background: #fff; border: 1px solid #e7eef5; border-radius: 25px; padding: 28px;
+        box-shadow: 0 8px 24px rgba(28,61,91,.05); margin-bottom: 24px;
+    }
+    .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 16px; }
+    .list-header h2 { margin: 0; font-size: 22px; font-weight: 900; }
+    .items-count { font-size: 13px; color: #7890a4; margin-top: 4px; }
+    .filter-area { display: flex; align-items: center; gap: 10px; }
+    .filter-label { font-size: 13px; font-weight: 700; color: #5a7388; }
+    .item-filter {
+        padding: 10px 16px; border-radius: 12px; border: 1px solid #d0e0ec;
+        font-size: 13px; font-weight: 600; color: #17324d; background: #f7fbfe; cursor: pointer;
+    }
+    .alert-success { background: #e8f8ef; color: #1a7a45; border: 1px solid #b8e6c9; padding: 14px 18px; border-radius: 14px; margin-bottom: 20px; font-weight: 600; }
+    .alert-danger { background: #fdecea; color: #b42318; border: 1px solid #f5c2c0; padding: 14px 18px; border-radius: 14px; margin-bottom: 20px; font-weight: 600; }
+    .items-table { width: 100%; border-collapse: collapse; }
+    .items-table th {
+        text-align: left; padding: 12px 14px; font-size: 12px; font-weight: 800; text-transform: uppercase;
+        letter-spacing: .04em; color: #5a7388; border-bottom: 2px solid #e7eef5;
+    }
+    .items-table td { padding: 16px 14px; border-bottom: 1px solid #eef3f8; vertical-align: middle; font-size: 14px; }
+    .items-table tr:last-child td { border-bottom: none; }
+    .item-title { font-weight: 800; color: #17324d; }
+    .badge {
+        display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: .03em;
+    }
+    .badge-lost { background: #fff3df; color: #c47a0a; }
+    .badge-found { background: #e7f4ff; color: #1a6fb5; }
+    .badge-claimed { background: #e8f8ef; color: #1a7a45; }
+    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-sm {
+        padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; border: none; cursor: pointer;
+        text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn-claim { background: #e8f8ef; color: #1a7a45; }
+    .btn-claim:hover { background: #d1f0df; }
+    .btn-delete { background: #fdecea; color: #b42318; }
+    .btn-delete:hover { background: #f8d4d2; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #7890a4; }
+    .empty-state h3 { margin: 16px 0 8px; color: #17324d; font-weight: 800; }
+    .back-button {
+        display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 14px;
+        background: #f0f7fc; color: #159dcc; font-weight: 800; font-size: 13px; text-decoration: none;
+        border: 1px solid #d0e8f5;
+    }
+    .back-button:hover { background: #e3f2fb; }
+    .thumb { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: #f0f7fc; }
+</style>
+
+<div class="admin-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <h1>Manage Items</h1>
+            <p>View and manage all approved lost &amp; found items. Mark items as claimed or move them to the Recycle Bin.</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="items-container">
+        <div class="list-header">
+            <div>
+                <h2>Recorded Items</h2>
+                <div class="items-count">@totalItems @(totalItems == 1 ? "item" : "items") found</div>
+            </div>
+            <div class="filter-area">
+                <span class="filter-label">Filter:</span>
+                <select class="item-filter"
+                        onchange="window.location.href='@Url.Action("Index", "ManageItems")?filter=' + encodeURIComponent(this.value)">
+                    @foreach (var f in new[] { "All Items", "Lost Items", "Found Items", "Claimed Items" })
+                    {
+                        if (currentFilter == f)
+                        {
+                            <option selected value="@f">@f</option>
+                        }
+                        else
+                        {
+                            <option value="@f">@f</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <h3>No items available</h3>
+                <p>Approved lost and found items will appear here.</p>
+            </div>
+        }
+        else
+        {
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Reported By</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.Title" class="thumb" />
+                                }
+                                else
+                                {
+                                    <div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#a0b4c4;font-size:11px;">N/A</div>
+                                }
+                            </td>
+                            <td>
+                                <div class="item-title">@item.Title</div>
+                                <div style="font-size:12px;color:#7890a4;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@item.Description</div>
+                            </td>
+                            <td>@(item.Category?.CategoryName ?? "—")</td>
+                            <td>@item.LocationFound</td>
+                            <td>
+                                @{
+                                    var badgeClass = item.Status switch
+                                    {
+                                        "Lost" => "badge-lost",
+                                        "Found" => "badge-found",
+                                        "Claimed" => "badge-claimed",
+                                        _ => "badge-lost"
+                                    };
+                                }
+                                <span class="badge @badgeClass">@item.Status</span>
+                            </td>
+                            <td>@(item.ReportedByUser?.FullName ?? "—")</td>
+                            <td>@item.DateReported.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <div class="action-btns">
+                                    @if (item.Status != "Claimed")
+                                    {
+                                        <form asp-action="MarkClaimed" method="post" style="display:inline;"
+                                              onsubmit="return confirm('Mark this item as claimed?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.ItemID" />
+                                            <button type="submit" class="btn-sm btn-claim">Mark Claimed</button>
+                                        </form>
+                                    }
+                                    <form asp-action="Delete" method="post" style="display:inline;"
+                                          onsubmit="return confirm('Move this item to the Recycle Bin? You can restore it later.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.ItemID" />
+                                        <button type="submit" class="btn-sm btn-delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <a asp-controller="Admin" asp-action="Index" class="back-button">
+        <span>←</span> Back to Admin Dashboard
+    </a>
+</div>

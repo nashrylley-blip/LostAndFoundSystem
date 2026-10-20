@@ -1,0 +1,531 @@
+﻿
+@model LostAndFoundSystem.Models.Item
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Report Details";
+}
+
+<style>
+    .reject-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.60);
+        backdrop-filter: blur(3px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .reject-modal-overlay.show {
+        display: flex;
+    }
+
+    .reject-modal {
+        width: 100%;
+        max-width: 520px;
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+        animation: rejectModalIn 0.22s ease-out;
+    }
+
+    .reject-modal-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 22px 24px;
+        background: #fff;
+        border-top: 5px solid #dc3545;
+        border-bottom: 1px solid #edf0f3;
+    }
+
+    .reject-header-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #fff0f1;
+        color: #dc3545;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .reject-modal-header h5 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .reject-close-btn {
+        margin-left: auto;
+        align-self: flex-start;
+        border: none;
+        background: transparent;
+        color: #8b95a5;
+        font-size: 28px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .reject-close-btn:hover {
+        color: #dc3545;
+    }
+
+    .reject-modal-body {
+        padding: 24px;
+    }
+
+    .reject-modal-body label {
+        display: block;
+        margin-bottom: 10px;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    #rejectReasonInput {
+        display: block;
+        width: 100%;
+        min-height: 135px;
+        resize: vertical;
+        padding: 13px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        background: #fff;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 14px;
+        line-height: 1.5;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #rejectReasonInput:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+    }
+
+    .reject-input-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 7px;
+        min-height: 18px;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    .reject-error {
+        color: #dc3545;
+        font-weight: 500;
+    }
+
+    .reject-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        background: #f9fafb;
+        border-top: 1px solid #edf0f3;
+    }
+
+    .reject-cancel-btn,
+    .reject-confirm-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 17px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .reject-cancel-btn {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+    }
+
+    .reject-cancel-btn:hover {
+        background: #f3f4f6;
+    }
+
+    .reject-confirm-btn {
+        border: 1px solid #dc3545;
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .reject-confirm-btn:hover {
+        background: #bb2d3b;
+        border-color: #bb2d3b;
+    }
+
+    .reject-confirm-btn:active,
+    .reject-cancel-btn:active {
+        transform: scale(0.98);
+    }
+
+    body.reject-modal-open {
+        overflow: hidden;
+    }
+
+    @@keyframes rejectModalIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .reject-modal-header {
+            padding: 18px;
+        }
+
+        .reject-modal-body {
+            padding: 18px;
+        }
+
+        .reject-modal-footer {
+            padding: 14px 18px;
+        }
+
+        .reject-modal-footer button {
+            flex: 1;
+        }
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h3 class="mb-1">Report Details</h3>
+
+            <small class="text-muted">
+                Review the report before approving or rejecting it.
+            </small>
+        </div>
+
+        <div class="card-body">
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="text-center mb-4">
+                    <img src="@Model.ImageUrl"
+                         alt="@Model.Title"
+                         style="max-width:400px; max-height:300px; object-fit:cover;"
+                         class="img-fluid rounded shadow-sm" />
+                </div>
+            }
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <strong>Item Name</strong>
+                    <div>@Model.Title</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Category</strong>
+                    <div>
+                        @(Model.Category?.CategoryName ?? "General")
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Item Status</strong>
+                    <div>@Model.Status</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Approval Status</strong>
+                    <div>@Model.ApprovalStatus</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Location</strong>
+                    <div>
+                        @(string.IsNullOrWhiteSpace(Model.LocationFound)
+                            ? "Not provided"
+                            : Model.LocationFound)
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Date Reported</strong>
+                    <div>
+                        @Model.DateReported.ToString("MMMM dd, yyyy hh:mm tt")
+                    </div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <strong>Description</strong>
+                    <div class="mt-1">
+                        @(string.IsNullOrWhiteSpace(Model.Description)
+                            ? "No description provided."
+                            : Model.Description)
+                    </div>
+                </div>
+
+            </div>
+
+            @if (Model.ApprovalStatus == "Rejected" &&
+                 !string.IsNullOrWhiteSpace(Model.RejectionReason))
+            {
+                <div class="alert alert-danger mt-2">
+                    <strong>Reason for Rejection</strong>
+                    <div class="mt-1">
+                        @Model.RejectionReason
+                    </div>
+                </div>
+            }
+
+            <hr />
+
+            <h5 class="mb-3">
+                Student Who Submitted the Report
+            </h5>
+
+            @if (Model.ReportedByUser != null)
+            {
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Full Name</strong>
+                        <div>@Model.ReportedByUser.FullName</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Email</strong>
+                        <div>@Model.ReportedByUser.Email</div>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">
+                    Student information is unavailable.
+                </p>
+            }
+
+            <div class="mt-4 d-flex gap-2 flex-wrap">
+
+                <a asp-controller="ManageReports"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to Reports
+                </a>
+
+                @if (Model.ApprovalStatus == "Pending")
+                {
+                    <form asp-controller="ManageReports"
+                          asp-action="Approve"
+                          asp-route-id="@Model.ItemID"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-success"
+                                onclick="return confirm('Approve this report? It will become an official Lost & Found post.');">
+                            Approve Report
+                        </button>
+
+                    </form>
+
+                    <form asp-controller="ManageReports"
+                          asp-action="Reject"
+                          asp-route-id="@Model.ItemID"
+                          method="post"
+                          id="rejectForm">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="rejectionReason"
+                               id="rejectionReason" />
+
+                        <button type="button"
+                                class="btn btn-danger"
+                                onclick="openRejectModal()">
+                            Reject Report
+                        </button>
+
+                    </form>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Reject Report Modal -->
+<div id="rejectModal"
+     class="reject-modal-overlay"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="rejectModalTitle">
+
+    <div class="reject-modal">
+
+        <div class="reject-modal-header">
+
+            <div class="reject-header-icon" aria-hidden="true">
+                !
+            </div>
+
+            <div>
+                <h5 id="rejectModalTitle">Reject Report</h5>
+            </div>
+
+            <button type="button"
+                    class="reject-close-btn"
+                    onclick="closeRejectModal()"
+                    aria-label="Close">
+                &times;
+            </button>
+
+        </div>
+
+        <div class="reject-modal-body">
+
+            <label for="rejectReasonInput">
+                Reason for Rejection
+            </label>
+
+            <textarea id="rejectReasonInput"
+                      maxlength="500"
+                      rows="5"></textarea>
+
+            <div class="reject-input-footer">
+                <span id="rejectError"
+                      class="reject-error"
+                      role="alert"></span>
+
+                <span id="rejectCharCount">0 / 500</span>
+            </div>
+
+        </div>
+
+        <div class="reject-modal-footer">
+
+            <button type="button"
+                    class="reject-cancel-btn"
+                    onclick="closeRejectModal()">
+                Cancel
+            </button>
+
+            <button type="button"
+                    class="reject-confirm-btn"
+                    onclick="submitRejection()">
+                Reject Report
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const rejectModal = document.getElementById("rejectModal");
+    const rejectReasonInput = document.getElementById("rejectReasonInput");
+    const rejectCharCount = document.getElementById("rejectCharCount");
+    const rejectError = document.getElementById("rejectError");
+
+    function openRejectModal() {
+        rejectReasonInput.value = "";
+        rejectCharCount.textContent = "0 / 500";
+        rejectError.textContent = "";
+
+        rejectModal.classList.add("show");
+        document.body.classList.add("reject-modal-open");
+
+        setTimeout(function () {
+            rejectReasonInput.focus();
+        }, 100);
+    }
+
+    function closeRejectModal() {
+        rejectModal.classList.remove("show");
+        document.body.classList.remove("reject-modal-open");
+    }
+
+    rejectReasonInput.addEventListener("input", function () {
+        rejectCharCount.textContent = this.value.length + " / 500";
+        rejectError.textContent = "";
+    });
+
+    function submitRejection() {
+        const reason = rejectReasonInput.value.trim();
+
+        if (!reason) {
+            rejectError.textContent =
+                "Please enter a rejection reason.";
+            rejectReasonInput.focus();
+            return;
+        }
+
+        if (reason.length > 500) {
+            rejectError.textContent =
+                "The reason must not exceed 500 characters.";
+            rejectReasonInput.focus();
+            return;
+        }
+
+        const confirmed = confirm(
+            "Are you sure you want to reject this report?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        document.getElementById("rejectionReason").value = reason;
+        document.getElementById("rejectForm").submit();
+    }
+
+    rejectModal.addEventListener("click", function (event) {
+        if (event.target === rejectModal) {
+            closeRejectModal();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" &&
+            rejectModal.classList.contains("show")) {
+            closeRejectModal();
+        }
+    });
+</script>

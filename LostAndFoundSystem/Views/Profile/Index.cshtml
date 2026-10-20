@@ -1,0 +1,119 @@
+@model LostAndFoundSystem.Models.User
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "My Profile";
+    bool isStudent = Model.Role == "Student";
+}
+
+<style>
+    .profile-page { max-width: 900px; margin: 0 auto; padding: 30px; color: #17324d; }
+    .profile-header {
+        background: linear-gradient(135deg, #72d3ee, #43b5df); color: white;
+        border-radius: 28px; padding: 40px; margin-bottom: 28px;
+        box-shadow: 0 12px 30px rgba(50,157,202,0.14);
+    }
+    .profile-header h1 { margin: 0 0 8px; font-size: 34px; font-weight: 900; }
+    .profile-header p { margin: 0; opacity: .95; font-size: 15px; }
+    .profile-card {
+        background: white; border: 1px solid #e7eef5; border-radius: 24px; padding: 32px;
+        box-shadow: 0 8px 24px rgba(28,61,91,.05); margin-bottom: 24px;
+    }
+    .profile-card h2 { margin: 0 0 20px; font-size: 20px; font-weight: 900; }
+    .info-row { display: flex; padding: 14px 0; border-bottom: 1px solid #eef3f8; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { width: 160px; font-weight: 800; font-size: 13px; color: #5a7388; text-transform: uppercase; letter-spacing: .03em; flex-shrink: 0; }
+    .info-value { font-size: 15px; font-weight: 600; color: #17324d; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 8px; }
+    .stat-box {
+        background: #f7fbfe; border: 1px solid #e0edf5; border-radius: 16px; padding: 20px; text-align: center;
+    }
+    .stat-num { font-size: 28px; font-weight: 900; color: #159dcc; }
+    .stat-label { font-size: 12px; font-weight: 700; color: #7890a4; margin-top: 4px; text-transform: uppercase; }
+    .badge {
+        display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 800;
+        text-transform: uppercase;
+    }
+    .badge-student { background: #e7f4ff; color: #1a6fb5; }
+    .badge-admin { background: #f0eaff; color: #5b3dc4; }
+    .back-button {
+        display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 14px;
+        background: #f0f7fc; color: #159dcc; font-weight: 800; font-size: 13px; text-decoration: none;
+        border: 1px solid #d0e8f5;
+    }
+    @@media (max-width: 700px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .info-row { flex-direction: column; gap: 4px; }
+        .info-label { width: auto; }
+    }
+</style>
+
+<div class="profile-page">
+    <div class="profile-header">
+        <h1>My Profile</h1>
+        <p>View your account information@(isStudent ? " and report statistics" : "").</p>
+    </div>
+
+    <div class="profile-card">
+        <h2>Account Information</h2>
+        <div class="info-row">
+            <div class="info-label">Full Name</div>
+            <div class="info-value">@Model.FullName</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Email</div>
+            <div class="info-value">@Model.Email</div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.StudentID))
+        {
+            <div class="info-row">
+                <div class="info-label">Student ID</div>
+                <div class="info-value">@Model.StudentID</div>
+            </div>
+        }
+        <div class="info-row">
+            <div class="info-label">Role</div>
+            <div class="info-value">
+                <span class="badge @(Model.Role == "Admin" ? "badge-admin" : "badge-student")">
+                    @(Model.Role == "Admin" ? "Administrator" : "Student")
+                </span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Member Since</div>
+            <div class="info-value">@Model.CreatedAt.ToString("MMMM dd, yyyy")</div>
+        </div>
+    </div>
+
+    @if (isStudent)
+    {
+        <div class="profile-card">
+            <h2>My Report Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num">@(ViewBag.TotalReports ?? 0)</div>
+                    <div class="stat-label">Total Reports</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">@(ViewBag.PendingReports ?? 0)</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">@(ViewBag.ApprovedReports ?? 0)</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">@(ViewBag.ClaimedItems ?? 0)</div>
+                    <div class="stat-label">Claimed</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @{
+        var backController = Model.Role == "Admin" ? "Admin" : "Home";
+    }
+    <a asp-controller="@backController" asp-action="Index" class="back-button">
+        <span>←</span> Back to Dashboard
+    </a>
+</div>
